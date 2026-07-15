@@ -1,0 +1,21 @@
+{
+  "name": "KoreParts — запчасти Kia, Hyundai, Genesis",
+  "short_name": "KoreParts",
+  "description": "Интернет-магазин автозапчастей для корейских автомобилей",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "lang": "ru",
+  "categories": ["shopping", "automotive"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
