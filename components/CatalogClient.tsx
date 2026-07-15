@@ -11,11 +11,12 @@ import {
   CATEGORIES,
   filterProducts,
   formatPrice,
+  MODELS,
   PRODUCTS,
   priceRange,
   type CatalogFilters,
 } from "@/lib/products";
-import type { CategoryId } from "@/lib/types";
+import type { BrandId, CategoryId } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
 export function CatalogClient() {
@@ -137,36 +138,146 @@ export function CatalogClient() {
   const activeCat = category
     ? CATEGORIES[category as CategoryId]
     : null;
+  const activeBrand = brand ? (brand as BrandId) : null;
+  const brandModels = activeBrand ? MODELS[activeBrand] : null;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header + breadcrumb path */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
+          <nav className="mb-2 text-xs text-[var(--text-muted)]">
+            <button
+              type="button"
+              onClick={reset}
+              className="hover:text-[var(--blue-bright)]"
+            >
+              Каталог
+            </button>
+            {activeBrand ? (
+              <>
+                {" / "}
+                <button
+                  type="button"
+                  onClick={() => pushState({ brand, model: "" })}
+                  className="hover:text-[var(--blue-bright)]"
+                >
+                  {BRANDS[activeBrand]}
+                </button>
+              </>
+            ) : null}
+            {model && activeBrand ? (
+              <>
+                {" / "}
+                <span className="text-[var(--text-h)]">
+                  {MODELS[activeBrand].find((m) => m.id === model)?.title ??
+                    model}
+                </span>
+              </>
+            ) : null}
+            {activeCat ? (
+              <>
+                {" / "}
+                <span className="text-[var(--text-h)]">{activeCat.title}</span>
+              </>
+            ) : null}
+          </nav>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-h)] md:text-3xl">
-            Каталог запчастей
+            {activeBrand
+              ? `${BRANDS[activeBrand]}${
+                  model
+                    ? ` ${
+                        MODELS[activeBrand].find((m) => m.id === model)
+                          ?.title ?? model
+                      }`
+                    : ""
+                }`
+              : activeCat
+                ? activeCat.title
+                : "Каталог запчастей"}
           </h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             Найдено:{" "}
             <b className="text-[var(--text-h)]">{products.length}</b>
-            {activeCat ? (
-              <>
-                {" "}
-                ·{" "}
-                <span className="text-[var(--blue-bright)]">
-                  {activeCat.title}
-                </span>
-              </>
-            ) : null}
           </p>
         </div>
+      </div>
+
+      {/* Brand quick select */}
+      <div className="card p-3 md:p-4">
+        <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+          Марка авто
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => pushState({ brand: "", model: "" })}
+            className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${
+              !brand
+                ? "bg-[var(--blue-dim)] text-[var(--blue-bright)] ring-1 ring-[rgba(59,130,246,0.35)]"
+                : "bg-[var(--bg)] text-[var(--text)] ring-1 ring-[var(--border)] hover:text-[var(--text-h)]"
+            }`}
+          >
+            Все марки
+          </button>
+          {(Object.entries(BRANDS) as [BrandId, string][]).map(([id, title]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => pushState({ brand: id, model: "" })}
+              className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${
+                brand === id
+                  ? "bg-[var(--blue-dim)] text-[var(--blue-bright)] ring-1 ring-[rgba(59,130,246,0.35)]"
+                  : "bg-[var(--bg)] text-[var(--text)] ring-1 ring-[var(--border)] hover:text-[var(--text-h)]"
+              }`}
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+
+        {/* Model subcatalogs when brand selected */}
+        {brandModels ? (
+          <div className="mt-3 border-t border-[var(--border)] pt-3">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+              Подкаталоги моделей · {BRANDS[activeBrand!]}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => pushState({ brand, model: "" })}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                  !model
+                    ? "bg-[var(--blue-dim)] text-[var(--blue-bright)]"
+                    : "bg-[var(--bg)] text-[var(--text-muted)] ring-1 ring-[var(--border)] hover:text-[var(--text-h)]"
+                }`}
+              >
+                Все модели
+              </button>
+              {brandModels.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => pushState({ brand, model: m.id })}
+                  className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                    model === m.id
+                      ? "bg-[var(--blue-dim)] text-[var(--blue-bright)]"
+                      : "bg-[var(--bg)] text-[var(--text-muted)] ring-1 ring-[var(--border)] hover:text-[var(--text-h)]"
+                  }`}
+                >
+                  {m.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* Category icons — Autodoc style */}
       <div className="card overflow-hidden p-4 md:p-5">
         <div className="mb-4 flex items-center justify-between gap-2">
           <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--blue-bright)]">
-            Категории
+            Каталоги / категории
           </div>
           {category ? (
             <button
@@ -186,21 +297,12 @@ export function CatalogClient() {
         />
       </div>
 
-      {/* Compact chips for mobile scroll after selection */}
-      <div className="md:hidden">
-        <CategoryGrid
-          variant="compact"
-          activeId={category}
-          onSelect={selectCategory}
-        />
-      </div>
-
       <div className="card p-4 md:p-5">
         <SearchBox />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="card h-fit space-y-4 p-4 lg:sticky lg:top-24">
+        <aside className="card h-fit space-y-4 p-4 lg:sticky lg:top-36">
           <div className="flex items-center justify-between gap-2">
             <div className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--text-h)]">
               Фильтры
