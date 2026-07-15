@@ -12,6 +12,7 @@ import {
   modelTitle,
 } from "@/lib/products";
 import type { Product } from "@/lib/types";
+import { CategoryIcon } from "./CategoryIcons";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
@@ -53,8 +54,13 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-          {cat?.emoji} {cat?.title}
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+          {cat ? (
+            <span className="inline-flex items-center gap-1">
+              <CategoryIcon id={product.category} size={14} />
+              {cat.title}
+            </span>
+          ) : null}
         </div>
         <Link
           href={`/product/${product.id}`}

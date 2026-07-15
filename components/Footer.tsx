@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { TELEGRAM_URL } from "@/lib/constants";
 import { CATEGORIES } from "@/lib/products";
+import type { CategoryId } from "@/lib/types";
+import { CategoryIcon } from "./CategoryIcons";
 
 export function Footer() {
   return (
@@ -14,8 +16,8 @@ export function Footer() {
             </span>
           </div>
           <p className="text-sm leading-relaxed text-[var(--text-muted)]">
-            Премиальный магазин запчастей Kia, Hyundai и Genesis. OEM, доставка
-            по РФ, подбор по VIN.
+            Запчасти Kia, Hyundai и Genesis. OEM, доставка по РФ, подбор по VIN.
+            Чистый каталог в стиле Autodoc.
           </p>
           <a
             href={TELEGRAM_URL}
@@ -23,7 +25,7 @@ export function Footer() {
             rel="noopener noreferrer"
             className="btn btn-accent btn-sm mt-4"
           >
-            ✈️ @KorePartsBot
+            @KorePartsBot
           </a>
         </div>
 
@@ -51,16 +53,24 @@ export function Footer() {
           <div className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--text-h)]">
             Категории
           </div>
-          <div className="flex flex-col gap-2.5 text-sm">
-            {Object.entries(CATEGORIES)
+          <div className="flex flex-col gap-2 text-sm">
+            {(
+              Object.entries(CATEGORIES) as [
+                CategoryId,
+                (typeof CATEGORIES)[CategoryId],
+              ][]
+            )
               .slice(0, 5)
               .map(([id, c]) => (
                 <Link
                   key={id}
                   href={`/catalog?category=${id}`}
-                  className="hover:text-[var(--blue-bright)]"
+                  className="flex items-center gap-2 hover:text-[var(--blue-bright)]"
                 >
-                  {c.emoji} {c.title}
+                  <span className="grid h-6 w-6 place-items-center rounded-md bg-[var(--bg-muted)] ring-1 ring-[var(--border)]">
+                    <CategoryIcon id={id} size={16} />
+                  </span>
+                  {c.title}
                 </Link>
               ))}
           </div>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { CategoryIcon } from "@/components/CategoryIcons";
 import { ProductCard } from "@/components/ProductCard";
 import { telegramProductUrl } from "@/lib/constants";
 import {
@@ -143,9 +144,13 @@ export default async function ProductPage({ params }: Props) {
         </div>
 
         <div className="space-y-5">
-          <div className="badge">
-            {cat?.emoji} {cat?.title}
-          </div>
+          <Link
+            href={`/catalog?category=${product.category}`}
+            className="badge inline-flex items-center gap-1.5"
+          >
+            <CategoryIcon id={product.category} size={16} />
+            {cat?.title}
+          </Link>
           <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[var(--text-h)] md:text-4xl">
             {product.name}
           </h1>

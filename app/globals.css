@@ -62,7 +62,7 @@ a {
 }
 
 .container-kp {
-  width: min(100% - 2rem, 1200px);
+  width: min(100% - 2rem, 1240px);
   margin-inline: auto;
 }
 
@@ -263,9 +263,9 @@ a {
   }
 }
 
-/* Hero banner */
+/* Hero banner — cleaner Autodoc-like height */
 .hero-banner {
-  min-height: min(92vh, 820px);
+  min-height: auto;
 }
 
 .hero-banner::after {
@@ -276,11 +276,36 @@ a {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(96, 165, 250, 0.5),
-    rgba(251, 113, 133, 0.45),
+    rgba(96, 165, 250, 0.45),
+    rgba(251, 113, 133, 0.35),
     transparent
   );
   z-index: 5;
+}
+
+/* Category cards */
+.cat-card {
+  will-change: transform;
+}
+
+.cat-card:focus-visible {
+  outline: 2px solid var(--blue-bright);
+  outline-offset: 2px;
+}
+
+/* Thin scrollbar for horizontal category chips */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
 }
 
 @keyframes fadeIn {

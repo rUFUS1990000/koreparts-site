@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { CategoryGrid } from "@/components/CategoryGrid";
+import { CategoryIcon } from "@/components/CategoryIcons";
 import { SearchBox } from "@/components/SearchBox";
 import {
   ALL_MODELS,
@@ -13,6 +15,7 @@ import {
   priceRange,
   type CatalogFilters,
 } from "@/lib/products";
+import type { CategoryId } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
 export function CatalogClient() {
@@ -77,7 +80,8 @@ export function CatalogClient() {
     if ("q" in patch && patch.q !== undefined) setQ(patch.q);
     if ("min" in patch && patch.min !== undefined) setMinPrice(patch.min);
     if ("max" in patch && patch.max !== undefined) setMaxPrice(patch.max);
-    if ("sort" in patch && patch.sort) setSort(patch.sort as CatalogFilters["sort"]);
+    if ("sort" in patch && patch.sort)
+      setSort(patch.sort as CatalogFilters["sort"]);
     if ("stock" in patch) setInStock(patch.stock === "1");
     if ("hits" in patch) setOnlyHits(patch.hits === "1");
 
@@ -122,17 +126,80 @@ export function CatalogClient() {
     router.replace("/catalog", { scroll: false });
   }
 
+  function selectCategory(id: CategoryId | "") {
+    pushState({ category: id });
+  }
+
   const modelOptions = brand
     ? ALL_MODELS.filter((m) => m.brand === brand)
     : ALL_MODELS;
 
+  const activeCat = category
+    ? CATEGORIES[category as CategoryId]
+    : null;
+
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-h)] md:text-3xl">
+            Каталог запчастей
+          </h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
+            Найдено:{" "}
+            <b className="text-[var(--text-h)]">{products.length}</b>
+            {activeCat ? (
+              <>
+                {" "}
+                ·{" "}
+                <span className="text-[var(--blue-bright)]">
+                  {activeCat.title}
+                </span>
+              </>
+            ) : null}
+          </p>
+        </div>
+      </div>
+
+      {/* Category icons — Autodoc style */}
+      <div className="card overflow-hidden p-4 md:p-5">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--blue-bright)]">
+            Категории
+          </div>
+          {category ? (
+            <button
+              type="button"
+              onClick={() => selectCategory("")}
+              className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--blue-bright)]"
+            >
+              Сбросить категорию
+            </button>
+          ) : null}
+        </div>
+        <CategoryGrid
+          variant="large"
+          activeId={category}
+          onSelect={selectCategory}
+          className="xl:grid-cols-7"
+        />
+      </div>
+
+      {/* Compact chips for mobile scroll after selection */}
+      <div className="md:hidden">
+        <CategoryGrid
+          variant="compact"
+          activeId={category}
+          onSelect={selectCategory}
+        />
+      </div>
+
       <div className="card p-4 md:p-5">
         <SearchBox />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="card h-fit space-y-4 p-4 lg:sticky lg:top-24">
           <div className="flex items-center justify-between gap-2">
             <div className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--text-h)]">
@@ -144,7 +211,9 @@ export function CatalogClient() {
           </div>
 
           <label className="block space-y-1.5 text-sm">
-            <span className="text-[var(--text-muted)]">Поиск (название / OEM)</span>
+            <span className="text-[var(--text-muted)]">
+              Поиск (название / OEM)
+            </span>
             <input
               className="input"
               placeholder="26300-35503, колодки…"
@@ -154,17 +223,45 @@ export function CatalogClient() {
             />
           </label>
 
+          {/* Category list with icons in sidebar */}
           <div className="space-y-1.5 text-sm">
             <span className="text-[var(--text-muted)]">Категория</span>
-            <div className="flex flex-wrap gap-1.5">
-              <Chip active={!category} onClick={() => pushState({ category: "" })} label="Все" />
-              {Object.entries(CATEGORIES).map(([id, c]) => (
-                <Chip
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => selectCategory("")}
+                className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm font-medium transition ${
+                  !category
+                    ? "bg-[var(--blue-dim)] text-[var(--blue-bright)]"
+                    : "text-[var(--text)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-h)]"
+                }`}
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--bg)] text-[10px] font-bold ring-1 ring-[var(--border)]">
+                  All
+                </span>
+                Все категории
+              </button>
+              {(
+                Object.entries(CATEGORIES) as [
+                  CategoryId,
+                  (typeof CATEGORIES)[CategoryId],
+                ][]
+              ).map(([id, c]) => (
+                <button
                   key={id}
-                  active={category === id}
-                  onClick={() => pushState({ category: id })}
-                  label={`${c.emoji} ${c.title.split(" ")[0]}`}
-                />
+                  type="button"
+                  onClick={() => selectCategory(id)}
+                  className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm font-medium transition ${
+                    category === id
+                      ? "bg-[var(--blue-dim)] text-[var(--blue-bright)]"
+                      : "text-[var(--text)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-h)]"
+                  }`}
+                >
+                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--bg)] ring-1 ring-[var(--border)]">
+                    <CategoryIcon id={id} size={20} />
+                  </span>
+                  <span className="line-clamp-1">{c.title}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -174,7 +271,9 @@ export function CatalogClient() {
             <select
               className="select"
               value={brand}
-              onChange={(e) => pushState({ brand: e.target.value, model: "" })}
+              onChange={(e) =>
+                pushState({ brand: e.target.value, model: "" })
+              }
             >
               <option value="">Все бренды</option>
               {Object.entries(BRANDS).map(([id, title]) => (
@@ -202,7 +301,10 @@ export function CatalogClient() {
             >
               <option value="">Все модели</option>
               {modelOptions.map((m) => (
-                <option key={`${m.brand}:${m.model}`} value={`${m.brand}:${m.model}`}>
+                <option
+                  key={`${m.brand}:${m.model}`}
+                  value={`${m.brand}:${m.model}`}
+                >
                   {m.label}
                 </option>
               ))}
@@ -234,14 +336,16 @@ export function CatalogClient() {
             </label>
           </div>
           <p className="text-[11px] text-[var(--text-muted)]">
-            Диапазон каталога: {formatPrice(range.min)} — {formatPrice(range.max)}
+            Диапазон: {formatPrice(range.min)} — {formatPrice(range.max)}
           </p>
 
           <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--text-h)]">
             <input
               type="checkbox"
               checked={inStock}
-              onChange={(e) => pushState({ stock: e.target.checked ? "1" : "" })}
+              onChange={(e) =>
+                pushState({ stock: e.target.checked ? "1" : "" })
+              }
               className="accent-[var(--blue)]"
             />
             Только в наличии
@@ -250,7 +354,9 @@ export function CatalogClient() {
             <input
               type="checkbox"
               checked={onlyHits}
-              onChange={(e) => pushState({ hits: e.target.checked ? "1" : "" })}
+              onChange={(e) =>
+                pushState({ hits: e.target.checked ? "1" : "" })
+              }
               className="accent-[var(--red)]"
             />
             Только хиты
@@ -271,7 +377,11 @@ export function CatalogClient() {
           </label>
 
           <div className="flex gap-2 pt-1">
-            <button type="button" className="btn btn-primary flex-1" onClick={apply}>
+            <button
+              type="button"
+              className="btn btn-primary flex-1"
+              onClick={apply}
+            >
               Применить
             </button>
             <button type="button" className="btn btn-ghost" onClick={reset}>
@@ -281,25 +391,16 @@ export function CatalogClient() {
         </aside>
 
         <div>
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--text-h)] md:text-3xl">
-                Каталог запчастей
-              </h1>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Найдено:{" "}
-                <b className="text-[var(--text-h)]">{products.length}</b> · умные
-                фильтры и live-поиск
-              </p>
-            </div>
-          </div>
-
           {products.length === 0 ? (
             <div className="card p-12 text-center">
               <p className="text-[var(--text-muted)]">
                 Ничего не найдено. Измените фильтры или сбросьте поиск.
               </p>
-              <button type="button" className="btn btn-primary mt-4" onClick={reset}>
+              <button
+                type="button"
+                className="btn btn-primary mt-4"
+                onClick={reset}
+              >
                 Сбросить фильтры
               </button>
             </div>
@@ -319,29 +420,5 @@ export function CatalogClient() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Chip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
-        active
-          ? "bg-[var(--blue-dim)] text-[var(--blue-bright)] ring-1 ring-[rgba(59,130,246,0.35)]"
-          : "bg-[var(--bg)] text-[var(--text-muted)] ring-1 ring-[var(--border)] hover:text-[var(--text-h)]"
-      }`}
-    >
-      {label}
-    </button>
   );
 }

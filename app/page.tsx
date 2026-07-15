@@ -1,79 +1,82 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { CategoryGrid } from "@/components/CategoryGrid";
+import { CategoryIcon } from "@/components/CategoryIcons";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ProductCard } from "@/components/ProductCard";
 import { PromosSection } from "@/components/PromosSection";
 import { ReviewsSection } from "@/components/ReviewsSection";
-import { SearchBox } from "@/components/SearchBox";
 import { VinLookup } from "@/components/VinLookup";
-import {
-  BRANDS,
-  CATEGORIES,
-  popularProducts,
-  PRODUCTS,
-} from "@/lib/products";
+import { BRANDS, CATEGORIES, popularProducts, PRODUCTS } from "@/lib/products";
+import type { CategoryId } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "KoreParts — премиум запчасти Kia, Hyundai, Genesis",
+  title: "KoreParts — запчасти Kia, Hyundai, Genesis",
   description:
     "Интернет-магазин автозапчастей для корейских автомобилей. Каталог с OEM, корзина, доставка по России. Тот же ассортимент, что в Telegram-боте.",
 };
 
 const benefits = [
   {
-    title: "Фокус на Korea",
-    text: "Только Kia, Hyundai и Genesis — подбор по модели и VIN без ошибок совместимости.",
-    icon: "🇰🇷",
+    title: "Только Korea",
+    text: "Kia, Hyundai и Genesis — подбор по модели и VIN без ошибок.",
+    id: "engine" as CategoryId,
   },
   {
-    title: "OEM в каждой карточке",
+    title: "OEM в карточке",
     text: "Артикулы как у дилера. Сверяйте с оригиналом за секунду.",
-    icon: "🏷",
+    id: "filters" as CategoryId,
   },
   {
-    title: "Единый каталог с ботом",
-    text: "Те же товары, что в @KorePartsBot — онлайн или в Telegram.",
-    icon: "🤖",
+    title: "Единый каталог",
+    text: "Те же товары, что в @KorePartsBot — сайт или Telegram.",
+    id: "electric" as CategoryId,
   },
   {
-    title: "Доставка по всей РФ",
+    title: "Доставка по РФ",
     text: "СДЭК, Boxberry, ПВЗ. Оплата при получении или перевод.",
-    icon: "🚚",
+    id: "body" as CategoryId,
   },
 ];
 
 export default function HomePage() {
-  const cats = Object.entries(CATEGORIES);
-
   return (
     <>
       <HeroBanner />
 
-      <section className="container-kp -mt-2 pb-4 pt-8 md:pt-10">
-        <div className="card p-4 md:p-5">
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--blue-bright)]">
-            Быстрый поиск
+      {/* Categories — main Autodoc-style block */}
+      <section className="container-kp py-14 md:py-16">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="section-title">Категории запчастей</h2>
+            <p className="section-sub">
+              Выберите раздел — тормоза, подвеска, двигатель и другие
+            </p>
           </div>
-          <SearchBox />
+          <Link href="/catalog" className="btn btn-ghost btn-sm">
+            Весь каталог →
+          </Link>
         </div>
+        <CategoryGrid variant="large" />
       </section>
 
-      <section className="container-kp py-12 md:py-16">
+      <section className="container-kp pb-4">
         <VinLookup variant="section" />
       </section>
 
       <PromosSection />
 
-      <section className="container-kp py-16">
-        <h2 className="section-title">Почему выбирают KoreParts</h2>
+      <section className="container-kp py-14">
+        <h2 className="section-title">Почему KoreParts</h2>
         <p className="section-sub">
-          Премиальный опыт покупки в стиле корейских автобрендов — без лишнего
-          шума, только нужные детали.
+          Чистый каталог и точный подбор — без лишнего шума
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {benefits.map((b) => (
             <div key={b.title} className="card card-hover p-5">
-              <div className="mb-3 text-2xl">{b.icon}</div>
+              <div className="mb-3 grid h-12 w-12 place-items-center rounded-xl bg-[var(--bg-muted)] ring-1 ring-[var(--border)]">
+                <CategoryIcon id={b.id} size={32} />
+              </div>
               <h3 className="mb-1.5 font-bold text-[var(--text-h)]">{b.title}</h3>
               <p className="text-sm leading-relaxed text-[var(--text-muted)]">
                 {b.text}
@@ -83,30 +86,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-[var(--border)] bg-[var(--bg-elevated)]/80 py-16">
+      {/* Detailed category rows with icons — Autodoc feel */}
+      <section className="border-y border-[var(--border)] bg-[var(--bg-elevated)]/60 py-14">
         <div className="container-kp">
-          <h2 className="section-title">Категории</h2>
+          <h2 className="section-title">Все разделы каталога</h2>
           <p className="section-sub">
-            От расходников до крупных узлов — всё для корейского автопарка.
+            Крупные иконки и быстрый переход к нужным деталям
           </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {cats.map(([id, c]) => {
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {(
+              Object.entries(CATEGORIES) as [
+                CategoryId,
+                (typeof CATEGORIES)[CategoryId],
+              ][]
+            ).map(([id, c]) => {
               const count = PRODUCTS.filter((p) => p.category === id).length;
               return (
                 <Link
                   key={id}
                   href={`/catalog?category=${id}`}
-                  className="card card-hover flex items-start gap-3 p-4"
+                  className="card card-hover group flex items-center gap-4 p-4"
                 >
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--bg-muted)] text-xl ring-1 ring-[var(--border)]">
-                    {c.emoji}
+                  <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[var(--bg-muted)] ring-1 ring-[var(--border)] transition group-hover:scale-105 group-hover:ring-[var(--border-glow)]">
+                    <CategoryIcon id={id} size={44} />
                   </span>
-                  <span>
-                    <span className="block font-semibold text-[var(--text-h)]">
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-[var(--text-h)] group-hover:text-[var(--blue-bright)]">
                       {c.title}
                     </span>
                     <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
-                      {c.blurb} · {count} шт.
+                      {c.blurb}
+                    </span>
+                    <span className="mt-1 block text-[11px] font-semibold text-[var(--blue-bright)]">
+                      {count} позиций →
                     </span>
                   </span>
                 </Link>
@@ -116,19 +128,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container-kp py-16">
+      <section className="container-kp py-14">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="section-title">Хиты продаж</h2>
             <p className="section-sub">То, что берут чаще всего</p>
           </div>
-          <Link href="/catalog?hits=1&sort=popular" className="btn btn-ghost btn-sm">
+          <Link
+            href="/catalog?hits=1&sort=popular"
+            className="btn btn-ghost btn-sm"
+          >
             Все хиты
           </Link>
         </div>
         <div className="grid-products">
           {popularProducts.map((p, i) => (
-            <div key={p.id} className="reveal" style={{ animationDelay: `${i * 50}ms` }}>
+            <div
+              key={p.id}
+              className="reveal"
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
               <ProductCard product={p} />
             </div>
           ))}
