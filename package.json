@@ -1,12 +1,16 @@
 {
   "name": "koreparts-site",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/copy-to-dist.mjs",
-    "start": "npx --yes serve dist -l 3000",
+    "build": "next build",
+    "build:static": "cross-env STATIC_EXPORT=1 next build && node scripts/copy-to-dist.mjs",
+    "start": "next start",
     "lint": "eslint"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "next": "16.2.10",
