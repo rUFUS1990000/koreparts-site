@@ -22,14 +22,18 @@ git push -u origin master
 5. Build Command: `npm run build` (по умолчанию)
 6. Output: **не** указывайте `dist` — Vercel использует `.next`
 
-### 3. Environment Variables
+### 3. Environment Variables (обязательно для ИИ)
 
-| Name | Value | Environment |
-|------|--------|-------------|
+В проекте Vercel: **Settings → Environment Variables** → добавить:
+
+| Name | Value | Environments |
+|------|--------|----------------|
 | `NEXT_PUBLIC_SITE_URL` | `https://ваш-проект.vercel.app` | Production, Preview |
+| `XAI_API_KEY` | `xai-...` ключ с https://console.x.ai | Production, Preview |
 
-После первого деплоя Vercel даст URL вида `https://koreparts-site-xxx.vercel.app` —  
-пропишите его в `NEXT_PUBLIC_SITE_URL` и сделайте **Redeploy**.
+После сохранения env нажмите **Deployments → ⋮ → Redeploy** (без redeploy ключ не подхватится).
+
+Ключ **нельзя** класть в GitHub / `.env` в репозитории — только в панели Vercel.
 
 Опционально: Custom Domain в **Settings → Domains**.
 
@@ -40,6 +44,7 @@ git push -u origin master
 - `/product/...` — карточки  
 - Корзина (localStorage)  
 - `/vin` — подбор  
+- Кнопка **«Помощник»** — отвечает ИИ (если `XAI_API_KEY` задан)  
 
 ---
 
