@@ -66,3 +66,15 @@ npm run build:static
 ```
 
 Заново залейте `dist/` на хостинг.
+
+## 6. ИИ-помощник на reg.ru
+
+Чат с ИИ ходит на `/api/chat` и нужен **сервер Node.js** + ключ `XAI_API_KEY`.
+
+- **Обычный shared-хостинг + `build:static`** — API не работает. Виджет откроется, но ответит fallback (Telegram).
+- **VPS / Node на reg.ru** — `npm run build && npm run start`, в env:
+  ```
+  XAI_API_KEY=xai-...
+  NEXT_PUBLIC_SITE_URL=https://ваш-домен.ru
+  ```
+- **Vercel** — добавьте `XAI_API_KEY` в Environment Variables, ключ: https://console.x.ai
