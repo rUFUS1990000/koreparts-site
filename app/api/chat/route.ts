@@ -31,6 +31,18 @@ function catalogContext(userText: string): string {
     .join("\n");
 }
 
+/** Проверка: есть ли ключ (без раскрытия значения) */
+export async function GET() {
+  const hasKey = Boolean((process.env.XAI_API_KEY || "").trim());
+  return NextResponse.json({
+    ok: true,
+    hasXaiKey: hasKey,
+    hint: hasKey
+      ? "Ключ XAI_API_KEY виден серверу"
+      : "Ключа нет: добавьте XAI_API_KEY в Vercel Environment Variables и сделайте Redeploy",
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as { messages?: ChatMessage[] };
@@ -50,13 +62,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const apiKey = process.env.XAI_API_KEY;
+    const apiKey = (process.env.XAI_API_KEY || "").trim();
     if (!apiKey) {
       return NextResponse.json(
         {
           error: "no_api_key",
           reply:
-            "ИИ-помощник пока не подключён (нет XAI_API_KEY на сервере). Напишите в Telegram @KorePartsBot или оставьте заявку на /request — менеджер поможет с подбором.",
+            "Ключ ИИ на Vercel ещё не подключён.\n\n1) Vercel → проект koreparts-site → Environment Variables\n2) Key: XAI_API_KEY  (именно так)\n3) Value: ваш ключ xai-...\n4) Environments: Production + Preview\n5) Save → Deployments → Redeploy\n\nПока можно написать в Telegram @KorePartsBot или оставить заявку /request",
         },
         { status: 503 },
       );
