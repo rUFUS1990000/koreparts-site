@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ProductCard } from "@/components/ProductCard";
+import { VinLookup } from "@/components/VinLookup";
 import { TELEGRAM_URL } from "@/lib/constants";
 import { BRANDS, popularProducts, PRODUCTS } from "@/lib/products";
 
@@ -33,27 +34,32 @@ export default function HomePage() {
         <CategoryGrid variant="large" />
       </section>
 
-      {/* Марки */}
+      {/* VIN-подбор */}
       <section className="border-y border-[var(--border)] bg-white py-10 md:py-12">
         <div className="container-kp">
-          <h2 className="section-title">Марки</h2>
-          <p className="section-sub">Переход в каталог бренда</p>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {Object.entries(BRANDS).map(([id, title]) => (
-              <Link
-                key={id}
-                href={`/catalog?brand=${id}`}
-                className="card card-hover group p-4 text-center sm:p-5"
-              >
-                <div className="text-lg font-extrabold text-[var(--text-h)] group-hover:text-[var(--blue-bright)] sm:text-xl">
-                  {title}
-                </div>
-                <div className="mt-1 text-xs text-[var(--text-muted)]">
-                  Запчасти →
-                </div>
-              </Link>
-            ))}
-          </div>
+          <VinLookup variant="section" />
+        </div>
+      </section>
+
+      {/* Марки */}
+      <section className="container-kp py-10 md:py-12">
+        <h2 className="section-title">Марки</h2>
+        <p className="section-sub">Переход в каталог бренда</p>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Object.entries(BRANDS).map(([id, title]) => (
+            <Link
+              key={id}
+              href={`/catalog?brand=${id}`}
+              className="card card-hover group p-4 text-center sm:p-5"
+            >
+              <div className="text-lg font-extrabold text-[var(--text-h)] group-hover:text-[var(--blue-bright)] sm:text-xl">
+                {title}
+              </div>
+              <div className="mt-1 text-xs text-[var(--text-muted)]">
+                Запчасти →
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
