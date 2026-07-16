@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  EMAIL_DISPLAY,
+  TELEGRAM_URL,
+  WORK_HOURS,
+} from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Контакты",
   description:
-    "Связаться с KoreParts: Telegram-бот, подбор запчастей по VIN для Kia, Hyundai, Genesis.",
+    "Связаться с KoreParts: Telegram, заявка на подбор, доставка по России.",
 };
 
 export default function ContactsPage() {
@@ -19,23 +24,36 @@ export default function ContactsPage() {
 
       <div className="mt-10 grid gap-5 md:grid-cols-2">
         <a
-          href="https://t.me/KorePartsBot"
+          href={TELEGRAM_URL}
           target="_blank"
           rel="noreferrer"
           className="card card-hover block p-6 md:p-8"
         >
-          <div className="text-3xl">🤖</div>
+          <div className="text-3xl">✈️</div>
           <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
-            Telegram-бот @KorePartsBot
+            Telegram @KorePartsBot
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-            Каталог, корзина и заказ прямо в мессенджере. Тот же ассортимент, что
-            на сайте.
+            Каталог, корзина и заказ в мессенджере. Быстрый ответ по наличию.
           </p>
           <span className="mt-4 inline-flex text-sm font-semibold text-[var(--blue-bright)]">
             Открыть бота →
           </span>
         </a>
+
+        <Link href="/request" className="card card-hover block p-6 md:p-8">
+          <div className="text-3xl">📝</div>
+          <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
+            Оставить заявку
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+            Форма на сайте: VIN, OEM, описание детали. Заявка сохранится в
+            личном кабинете.
+          </p>
+          <span className="mt-4 inline-flex text-sm font-semibold text-[var(--blue-bright)]">
+            Заполнить форму →
+          </span>
+        </Link>
 
         <div className="card p-6 md:p-8">
           <div className="text-3xl">🕒</div>
@@ -43,42 +61,31 @@ export default function ContactsPage() {
             Режим работы
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-[var(--text)]">
-            <li>Пн–Сб: 10:00–20:00 (МСК)</li>
+            <li>{WORK_HOURS}</li>
             <li>Вс: по сообщениям в Telegram</li>
-            <li>Ответ обычно в течение нескольких часов</li>
+            <li>Ответ обычно в течение 15–30 минут</li>
           </ul>
         </div>
 
         <div className="card p-6 md:p-8">
-          <div className="text-3xl">🔧</div>
+          <div className="text-3xl">📧</div>
           <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
-            Для быстрого подбора
+            Email и кабинет
           </h2>
           <p className="mt-2 text-sm text-[var(--text-muted)]">
-            Пришлите:
-          </p>
-          <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-[var(--text)]">
-            <li>марку, модель и год</li>
-            <li>VIN (если есть)</li>
-            <li>название или OEM-артикул</li>
-          </ul>
-        </div>
-
-        <div className="card p-6 md:p-8">
-          <div className="text-3xl">🌐</div>
-          <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
-            Заказ на сайте
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-            Добавьте товары в корзину и оформите заказ — мы получим заявку и
-            свяжемся для подтверждения.
+            <a
+              href={`mailto:${EMAIL_DISPLAY}`}
+              className="font-semibold text-[var(--blue-bright)] hover:underline"
+            >
+              {EMAIL_DISPLAY}
+            </a>
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/catalog" className="btn btn-primary btn-sm">
-              Каталог
+            <Link href="/account" className="btn btn-primary btn-sm">
+              Личный кабинет
             </Link>
-            <Link href="/checkout" className="btn btn-ghost btn-sm">
-              Оформить
+            <Link href="/catalog" className="btn btn-ghost btn-sm">
+              Каталог
             </Link>
           </div>
         </div>
@@ -88,21 +95,20 @@ export default function ContactsPage() {
         <div className="grid md:grid-cols-2">
           <div className="p-6 md:p-8">
             <h2 className="text-xl font-bold text-[var(--text-h)]">
-              Регионы работы
+              Регионы и для сервисов
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
               Отправляем по всей России. Работаем с частными клиентами и
-              сервисами. Для оптовых запросов — напишите в бот с пометкой
-              «опт».
+              СТО. Для опта напишите в Telegram с пометкой «опт».
             </p>
           </div>
-          <div className="flex items-center justify-center bg-gradient-to-br from-blue-600/20 to-rose-600/15 p-8 text-center">
+          <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 to-rose-50 p-8 text-center">
             <div>
               <div className="text-4xl font-black tracking-tight text-[var(--text-h)]">
                 KoreParts
               </div>
               <div className="mt-1 text-sm text-[var(--text-muted)]">
-                Kia · Hyundai · Genesis
+                Kia · Hyundai · Genesis · SsangYong
               </div>
             </div>
           </div>

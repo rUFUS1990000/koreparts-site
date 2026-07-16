@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#05070d",
-  "theme_color": "#05070d",
+  "background_color": "#f4f6fa",
+  "theme_color": "#2563eb",
   "lang": "ru",
   "categories": ["shopping", "automotive"],
   "icons": [

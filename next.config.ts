@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   ...(isStaticExport
     ? {
         output: "export" as const,
+        trailingSlash: true,
         images: {
           unoptimized: true,
           remotePatterns: [

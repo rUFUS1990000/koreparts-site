@@ -41,7 +41,7 @@ export function ProductCard({ product }: { product: Product }) {
           className="object-cover transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, 25vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
         {product.popular && (
           <span className="badge badge-red absolute left-3 top-3">Хит</span>
         )}

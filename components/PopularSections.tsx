@@ -45,7 +45,7 @@ export function PopularSections() {
         <div>
           <h2 className="section-title">Популярные разделы</h2>
           <p className="section-sub">
-            ТО, оригинал, масла, подвеска — быстрый вход как на Autodoc
+            ТО, оригинал, подвеска, тормоза — быстрый вход в каталог
           </p>
         </div>
         <Link href="/catalog" className="btn btn-ghost btn-sm">
@@ -60,10 +60,10 @@ export function PopularSections() {
             <Link
               key={s.id}
               href={s.href}
-              className={`cat-card group flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-4 ${a.ring}`}
+              className={`cat-card group flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3.5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md sm:p-4 ${a.ring}`}
             >
               <span
-                className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${a.wrap} ring-1 ring-white/5 transition group-hover:scale-105`}
+                className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${a.wrap} ring-1 ring-black/5 transition group-hover:scale-105`}
               >
                 <SectionIcon icon={s.icon} />
               </span>

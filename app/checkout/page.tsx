@@ -94,7 +94,10 @@ export default function CheckoutPage() {
             .
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/catalog" className="btn btn-primary">
+            <Link href="/account" className="btn btn-primary">
+              В личный кабинет
+            </Link>
+            <Link href="/catalog" className="btn btn-ghost">
               В каталог
             </Link>
             <a
@@ -103,7 +106,7 @@ export default function CheckoutPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              ✈️ Telegram-бот
+              Telegram
             </a>
           </div>
         </div>

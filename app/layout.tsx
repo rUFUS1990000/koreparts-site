@@ -20,26 +20,27 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://koreparts.example.com";
 
 export const viewport: Viewport = {
-  themeColor: "#05070d",
+  themeColor: "#f4f6fa",
   width: "device-width",
   initialScale: 1,
-  colorScheme: "dark",
+  colorScheme: "light",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} — запчасти Kia, Hyundai, Genesis`,
+    default: `${SITE_NAME} — запчасти Kia, Hyundai, Genesis, SsangYong`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Интернет-магазин автозапчастей для корейских автомобилей: фильтры, тормоза, подвеска, масла, электрика. 90+ позиций с OEM. Доставка по РФ. Telegram-бот @KorePartsBot.",
+    "Интернет-магазин автозапчастей для корейских автомобилей: фильтры, тормоза, подвеска, электрика. 1400+ позиций с OEM. Заявка на подбор, доставка по РФ. Telegram @KorePartsBot.",
   applicationName: SITE_NAME,
   keywords: [
     "KoreParts",
     "запчасти Kia",
     "запчасти Hyundai",
     "запчасти Genesis",
+    "запчасти SsangYong",
     "Kia Rio запчасти",
     "Hyundai Solaris",
     "Hyundai Creta",
@@ -65,7 +66,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
-      "Каталог запчастей Kia, Hyundai, Genesis. OEM-артикулы, корзина, доставка по России.",
+      "Каталог запчастей Kia, Hyundai, Genesis, SsangYong. OEM, заявка, доставка по России.",
   },
   twitter: {
     card: "summary_large_image",

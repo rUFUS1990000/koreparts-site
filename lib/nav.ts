@@ -1,12 +1,12 @@
 import type { BrandId, CategoryId } from "./types";
 
-/** Пункты верхнего меню (как Autodoc: каталоги + служебные) */
+/** Основные пункты навигации */
 export const MAIN_NAV = [
-  { href: "/", label: "Главная" },
-  { href: "/catalog", label: "Каталог", isCatalogs: true },
+  { href: "/catalog", label: "Каталог" },
+  { href: "/request", label: "Оставить заявку" },
+  { href: "/vin", label: "VIN-подбор" },
   { href: "/delivery", label: "Доставка" },
   { href: "/contacts", label: "Контакты" },
-  { href: "/cart", label: "Корзина" },
 ] as const;
 
 /**
@@ -41,11 +41,11 @@ export const POPULAR_SECTIONS: PopularSection[] = [
     accent: "blue",
   },
   {
-    id: "oils",
-    title: "Масла и жидкости",
-    blurb: "Моторные, ATF, антифриз",
-    href: "/catalog?category=oils",
-    icon: "oils",
+    id: "request",
+    title: "Под заказ",
+    blurb: "Заявка на подбор по VIN/OEM",
+    href: "/request",
+    icon: "to",
     accent: "orange",
   },
   {

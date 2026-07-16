@@ -4,7 +4,7 @@ function Stars({ n }: { n: number }) {
   return (
     <span className="tracking-tight text-amber-400" aria-label={`${n} из 5`}>
       {"★".repeat(n)}
-      <span className="text-slate-600">{"★".repeat(5 - n)}</span>
+      <span className="text-slate-300">{"★".repeat(5 - n)}</span>
     </span>
   );
 }
@@ -17,7 +17,7 @@ export function ReviewsSection() {
           <div>
             <h2 className="section-title">Отзывы клиентов</h2>
             <p className="section-sub">
-              Реальные истории владельцев Kia, Hyundai и Genesis
+              Реальные истории владельцев Kia, Hyundai, Genesis
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2 text-sm">
