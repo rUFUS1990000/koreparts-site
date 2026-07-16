@@ -18,6 +18,8 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SRC = Path(r"C:\Users\Windows\Downloads\2_5357174925197089460.xlsx")
 OUT = ROOT / "lib" / "bot-products.json"
+# Наценка к розничной цене из прайса (30%)
+MARKUP = 1.30
 
 # Themed Unsplash images (site already allows images.unsplash.com)
 IMG = {
@@ -280,6 +282,8 @@ def parse_rows(src: Path) -> list[tuple[str, str, int, int]]:
             continue
         st = int(stock) if stock is not None and str(stock).strip() != "" else 0
         pr = int(price) if isinstance(price, int) else int(float(price))
+        # +30% к цене из прайса, округление до целых рублей
+        pr = max(1, int(round(pr * MARKUP)))
         rows.append((art_s, name_s, pr, st))
     return rows
 
