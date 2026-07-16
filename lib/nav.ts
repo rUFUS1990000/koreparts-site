@@ -1,10 +1,9 @@
 import type { BrandId, CategoryId } from "./types";
 
-/** Основные пункты навигации */
+/** Основные пункты навигации (без перегруза) */
 export const MAIN_NAV = [
   { href: "/catalog", label: "Каталог" },
-  { href: "/request", label: "Оставить заявку" },
-  { href: "/vin", label: "VIN-подбор" },
+  { href: "/request", label: "Заявка" },
   { href: "/delivery", label: "Доставка" },
   { href: "/contacts", label: "Контакты" },
 ] as const;

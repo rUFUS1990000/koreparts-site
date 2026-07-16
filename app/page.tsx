@@ -1,13 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BrandModelSelector } from "@/components/BrandModelSelector";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { HeroBanner } from "@/components/HeroBanner";
-import { PopularSections } from "@/components/PopularSections";
 import { ProductCard } from "@/components/ProductCard";
-import { PromosSection } from "@/components/PromosSection";
-import { ReviewsSection } from "@/components/ReviewsSection";
-import { VinLookup } from "@/components/VinLookup";
 import { TELEGRAM_URL } from "@/lib/constants";
 import { BRANDS, popularProducts, PRODUCTS } from "@/lib/products";
 
@@ -18,46 +13,56 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
+  const hits = popularProducts.slice(0, 4);
+
   return (
     <>
       <HeroBanner />
 
-      <PopularSections />
-
-      <div className="pb-12 md:pb-14">
-        <BrandModelSelector variant="panel" />
-      </div>
-
-      <section className="border-y border-[var(--border)] bg-white py-12 md:py-14">
-        <div className="container-kp">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="section-title">Каталоги запчастей</h2>
-              <p className="section-sub">
-                Тормоза, подвеска, двигатель, фильтры, электрика и кузов
-              </p>
-            </div>
-            <Link href="/catalog" className="btn btn-ghost btn-sm">
-              Весь каталог →
-            </Link>
+      {/* Категории */}
+      <section className="container-kp py-10 md:py-12">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="section-title">Каталоги</h2>
+            <p className="section-sub">Выберите раздел — {PRODUCTS.length}+ позиций</p>
           </div>
-          <CategoryGrid variant="large" />
+          <Link href="/catalog" className="btn btn-ghost btn-sm">
+            Весь каталог →
+          </Link>
+        </div>
+        <CategoryGrid variant="large" />
+      </section>
+
+      {/* Марки */}
+      <section className="border-y border-[var(--border)] bg-white py-10 md:py-12">
+        <div className="container-kp">
+          <h2 className="section-title">Марки</h2>
+          <p className="section-sub">Переход в каталог бренда</p>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Object.entries(BRANDS).map(([id, title]) => (
+              <Link
+                key={id}
+                href={`/catalog?brand=${id}`}
+                className="card card-hover group p-4 text-center sm:p-5"
+              >
+                <div className="text-lg font-extrabold text-[var(--text-h)] group-hover:text-[var(--blue-bright)] sm:text-xl">
+                  {title}
+                </div>
+                <div className="mt-1 text-xs text-[var(--text-muted)]">
+                  Запчасти →
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="container-kp py-12 md:py-14">
-        <VinLookup variant="section" />
-      </section>
-
-      <PromosSection />
-
-      <section className="container-kp py-12 md:py-14">
-        <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+      {/* Хиты */}
+      <section className="container-kp py-10 md:py-12">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="section-title">Хиты продаж</h2>
-            <p className="section-sub">
-              Популярные позиции из наличия — {PRODUCTS.length}+ в каталоге
-            </p>
+            <h2 className="section-title">Популярное</h2>
+            <p className="section-sub">Часто заказывают из наличия</p>
           </div>
           <Link
             href="/catalog?hits=1&sort=popular"
@@ -67,62 +72,25 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid-products">
-          {popularProducts.map((p, i) => (
-            <div
-              key={p.id}
-              className="reveal"
-              style={{ animationDelay: `${i * 40}ms` }}
-            >
-              <ProductCard product={p} />
-            </div>
+          {hits.map((p) => (
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>
 
-      <ReviewsSection />
-
-      <section className="border-y border-[var(--border)] bg-white py-12 md:py-14">
-        <div className="container-kp">
-          <h2 className="section-title">Марки</h2>
-          <p className="section-sub">Переход в каталог бренда</p>
-          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(BRANDS).map(([id, title]) => (
-              <Link
-                key={id}
-                href={`/catalog?brand=${id}`}
-                className="card card-hover group relative overflow-hidden p-5"
-              >
-                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl transition group-hover:bg-blue-500/15" />
-                <div className="relative">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--blue-bright)]">
-                    Каталог
-                  </div>
-                  <div className="mt-1.5 text-2xl font-extrabold tracking-tight text-[var(--text-h)]">
-                    {title}
-                  </div>
-                  <div className="mt-1 text-sm text-[var(--text-muted)]">
-                    Модели и запчасти →
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="container-kp py-12 md:pb-20">
-        <div className="card relative overflow-hidden p-8 md:flex md:items-center md:justify-between md:gap-8 md:p-10">
+      {/* CTA */}
+      <section className="container-kp pb-14 md:pb-16">
+        <div className="card relative overflow-hidden p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-transparent to-rose-50" />
-          <div className="relative max-w-xl">
-            <h2 className="text-2xl font-bold text-[var(--text-h)] md:text-3xl">
-              Нужен подбор или деталь под заказ?
+          <div className="relative max-w-lg">
+            <h2 className="text-xl font-bold text-[var(--text-h)] md:text-2xl">
+              Не нашли деталь?
             </h2>
-            <p className="mt-2 text-[var(--text)]">
-              Оставьте заявку или напишите в Telegram — подтвердим наличие и
-              сроки доставки.
+            <p className="mt-1.5 text-sm text-[var(--text-muted)]">
+              Оставьте заявку или напишите в Telegram — подберём по VIN/OEM.
             </p>
           </div>
-          <div className="relative mt-6 flex flex-wrap gap-3 md:mt-0">
+          <div className="relative mt-5 flex flex-wrap gap-2 md:mt-0">
             <Link href="/request" className="btn btn-accent">
               Оставить заявку
             </Link>
@@ -132,11 +100,8 @@ export default function HomePage() {
               rel="noreferrer"
               className="btn btn-primary"
             >
-              @KorePartsBot
+              Telegram
             </a>
-            <Link href="/account" className="btn btn-ghost">
-              Кабинет
-            </Link>
           </div>
         </div>
       </section>
