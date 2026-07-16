@@ -1,4 +1,4 @@
-export type BrandId = "hyundai" | "kia" | "genesis";
+export type BrandId = "hyundai" | "kia" | "genesis" | "ssangyong";
 export type CategoryId =
   | "engine"
   | "chassis"

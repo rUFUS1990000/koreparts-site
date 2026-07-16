@@ -155,12 +155,13 @@ function guessBrand(vin: string): BrandId {
 
 function guessModel(brand: BrandId, vin: string): string {
   // char-based stub pick stable model from VIN hash
-  const models =
-    brand === "hyundai"
-      ? ["solaris", "creta", "tucson", "santafe", "elantra"]
-      : brand === "kia"
-        ? ["rio", "ceed", "sportage", "sorento", "k5"]
-        : ["g70", "g80", "gv70", "gv80"];
+  const modelsByBrand: Record<BrandId, string[]> = {
+    hyundai: ["solaris", "creta", "tucson", "santafe", "elantra", "sonata"],
+    kia: ["rio", "ceed", "sportage", "sorento", "k5", "carnival"],
+    genesis: ["g70", "g80", "gv70", "gv80"],
+    ssangyong: ["kyron", "rexton", "actyon", "korando", "rodius"],
+  };
+  const models = modelsByBrand[brand] ?? modelsByBrand.hyundai;
   let h = 0;
   for (let i = 0; i < vin.length; i++) h = (h + vin.charCodeAt(i) * (i + 1)) % 997;
   return models[h % models.length];

@@ -96,18 +96,23 @@ export const BRAND_META: Record<
 > = {
   kia: {
     title: "Kia",
-    tagline: "Rio · Ceed · Sportage · Sorento · K5",
+    tagline: "Rio · Sportage · Sorento · Carnival · K5",
     color: "#e11d48",
   },
   hyundai: {
     title: "Hyundai",
-    tagline: "Solaris · Creta · Tucson · Santa Fe · Elantra",
+    tagline: "Solaris · Creta · Tucson · Santa Fe · Sonata",
     color: "#2563eb",
   },
   genesis: {
     title: "Genesis",
     tagline: "G70 · G80 · GV70 · GV80",
     color: "#a78bfa",
+  },
+  ssangyong: {
+    title: "SsangYong",
+    tagline: "Kyron · Rexton · Actyon · Korando · Rodius",
+    color: "#0d9488",
   },
 };
 
