@@ -135,7 +135,7 @@ export default function AccountPage() {
               t: totalQty ? `${totalQty} шт.` : "Пусто",
             },
           ].map((s) => (
-            <div key={s.k} className="bg-white px-4 py-4">
+            <div key={s.k} className="bg-[var(--bg-elevated)] px-4 py-4">
               <div className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
                 {s.k}
               </div>
@@ -251,7 +251,7 @@ export default function AccountPage() {
             <div className="card p-5">
               <h2 className="font-bold text-[var(--text-h)]">Мой автомобиль</h2>
               {profile.carBrand || profile.carModel ? (
-                <div className="mt-3 rounded-2xl border border-[var(--border)] bg-gradient-to-br from-blue-50 to-slate-50 p-4">
+                <div className="mt-3 rounded-2xl border border-[var(--border)] bg-gradient-to-br from-[var(--blue-dim)] to-[var(--bg-muted)] p-4">
                   <div className="text-xs font-bold uppercase tracking-wide text-[var(--blue-bright)]">
                     Гараж
                   </div>

@@ -22,7 +22,7 @@ export function HeroBanner() {
   const cat = CATEGORIES[featured.category];
 
   return (
-    <section className="hero-banner relative overflow-hidden border-b border-[var(--border)] bg-white">
+    <section className="hero-banner relative overflow-hidden border-b border-[var(--border)] bg-[var(--bg-elevated)]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_80%_40%,rgba(37,99,235,0.08),transparent_55%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_10%_90%,rgba(225,29,72,0.05),transparent_50%)]" />
 

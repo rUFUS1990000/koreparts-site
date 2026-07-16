@@ -3,7 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Providers } from "@/components/Providers";
-import { SITE_NAME, SITE_TAGLINE, TELEGRAM_URL } from "@/lib/constants";
+import {
+  SITE_NAME,
+  SITE_TAGLINE,
+  TELEGRAM_URL,
+  THEME_INIT_SCRIPT,
+} from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,10 +25,13 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://koreparts.example.com";
 
 export const viewport: Viewport = {
-  themeColor: "#f4f6fa",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f6fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#05070d" },
+  ],
   width: "device-width",
   initialScale: 1,
-  colorScheme: "light",
+  colorScheme: "light dark",
 };
 
 export const metadata: Metadata = {
@@ -104,7 +112,13 @@ export default function RootLayout({
     <html
       lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">
         <script
           type="application/ld+json"

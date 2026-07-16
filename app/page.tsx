@@ -35,7 +35,7 @@ export default function HomePage() {
       </section>
 
       {/* VIN-подбор */}
-      <section className="border-y border-[var(--border)] bg-white py-10 md:py-12">
+      <section className="border-y border-[var(--border)] bg-[var(--bg-elevated)] py-10 md:py-12">
         <div className="container-kp">
           <VinLookup variant="section" />
         </div>
@@ -87,7 +87,7 @@ export default function HomePage() {
       {/* CTA */}
       <section className="container-kp pb-14 md:pb-16">
         <div className="card relative overflow-hidden p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-transparent to-rose-50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--blue-dim)] via-transparent to-[var(--red-dim)]" />
           <div className="relative max-w-lg">
             <h2 className="text-xl font-bold text-[var(--text-h)] md:text-2xl">
               Не нашли деталь?

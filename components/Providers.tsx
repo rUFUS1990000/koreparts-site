@@ -1,13 +1,16 @@
 "use client";
 
-import { CartProvider } from "@/lib/cart-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { CartProvider } from "@/lib/cart-context";
+import { ThemeProvider } from "@/lib/theme";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      <ServiceWorkerRegister />
-      {children}
-    </CartProvider>
+    <ThemeProvider>
+      <CartProvider>
+        <ServiceWorkerRegister />
+        {children}
+      </CartProvider>
+    </ThemeProvider>
   );
 }

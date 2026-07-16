@@ -102,7 +102,7 @@ export default function ContactsPage() {
               СТО. Для опта напишите в Telegram с пометкой «опт».
             </p>
           </div>
-          <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 to-rose-50 p-8 text-center">
+          <div className="flex items-center justify-center bg-gradient-to-br from-[var(--blue-dim)] to-[var(--red-dim)] p-8 text-center">
             <div>
               <div className="text-4xl font-black tracking-tight text-[var(--text-h)]">
                 KoreParts

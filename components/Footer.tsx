@@ -13,7 +13,7 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t border-[var(--border)] bg-[var(--bg-elevated)]">
       {/* CTA strip */}
-      <div className="border-b border-[var(--border)] bg-gradient-to-r from-blue-50 via-white to-rose-50">
+      <div className="border-b border-[var(--border)] bg-gradient-to-r from-[var(--blue-dim)] via-[var(--bg-elevated)] to-[var(--red-dim)]">
         <div className="container-kp flex flex-col items-start justify-between gap-4 py-6 sm:flex-row sm:items-center">
           <div>
             <div className="text-lg font-bold text-[var(--text-h)]">
@@ -139,7 +139,7 @@ export function Footer() {
               <Link
                 key={id}
                 href={`/catalog?brand=${id}`}
-                className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--text-h)] shadow-sm transition hover:border-blue-300 hover:text-[var(--blue-bright)]"
+                className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-1.5 text-sm font-semibold text-[var(--text-h)] shadow-sm transition hover:border-blue-300 hover:text-[var(--blue-bright)]"
               >
                 {BRANDS[id]}
               </Link>

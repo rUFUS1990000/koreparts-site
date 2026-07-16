@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context";
 import { TELEGRAM_URL } from "@/lib/constants";
 import { MAIN_NAV } from "@/lib/nav";
 import { CatalogsMenu } from "./CatalogsMenu";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const pathname = usePathname();
@@ -55,6 +56,8 @@ export function Header() {
           </nav>
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            <ThemeToggle />
+
             <Link
               href="/request"
               className="btn btn-accent btn-sm hidden sm:inline-flex"
@@ -102,7 +105,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="max-h-[min(80vh,640px)] overflow-y-auto border-b border-[var(--border)] bg-white shadow-lg lg:hidden">
+        <div className="max-h-[min(80vh,640px)] overflow-y-auto border-b border-[var(--border)] bg-[var(--bg-elevated)] shadow-lg lg:hidden">
           <div className="container-kp flex flex-col gap-4 py-4">
             <nav className="flex flex-col gap-0.5">
               {[
