@@ -10,6 +10,7 @@ import {
   CATEGORIES,
   formatPrice,
   modelTitle,
+  yearLabel,
 } from "@/lib/products";
 import type { Product } from "@/lib/types";
 import { CategoryIcon } from "./CategoryIcons";
@@ -68,8 +69,16 @@ export function ProductCard({ product }: { product: Product }) {
         >
           {product.name}
         </Link>
-        <div className="text-xs text-[var(--text-muted)]">
-          {brandTitle(product.brand)} {modelTitle(product.brand, product.model)}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--text-muted)]">
+          <span>
+            {brandTitle(product.brand)}{" "}
+            {modelTitle(product.brand, product.model)}
+          </span>
+          {yearLabel(product) ? (
+            <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 font-semibold text-[var(--text-h)] ring-1 ring-[var(--border)]">
+              {yearLabel(product)}
+            </span>
+          ) : null}
         </div>
         <div className="rounded-lg bg-[var(--bg)] px-2 py-1 font-mono text-[11px] text-[var(--blue-bright)] ring-1 ring-[var(--border)]">
           OEM {product.oem}

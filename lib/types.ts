@@ -20,6 +20,10 @@ export interface Product {
   desc: string;
   image: string;
   popular?: boolean;
+  /** Год начала применимости (из названия, напр. 2018-) */
+  yearFrom?: number;
+  /** Год конца; если нет — «и новее» */
+  yearTo?: number;
 }
 
 export interface CartItem {

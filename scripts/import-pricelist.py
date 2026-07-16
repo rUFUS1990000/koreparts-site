@@ -241,6 +241,60 @@ def clean_name(name: str) -> str:
     return re.sub(r"\s+", " ", n)
 
 
+def _two_digit_year(y: int) -> int | None:
+    """00–30 → 2000–2030, 90–99 → 1990–1999."""
+    if 0 <= y <= 30:
+        return 2000 + y
+    if 90 <= y <= 99:
+        return 1900 + y
+    return None
+
+
+def parse_years(name: str) -> tuple[int | None, int | None]:
+    """Извлечь диапазон годов из названия: 2018-, 09-, 15-20, Sorento 2021."""
+    n = name
+    starts: list[int] = []
+    ends: list[int] = []
+
+    # 2015-2020 / 2018-
+    for m in re.finditer(r"(20\d{2}|19\d{2})\s*[-–]\s*(20\d{2}|19\d{2})?", n):
+        y1 = int(m.group(1))
+        starts.append(y1)
+        if m.group(2):
+            ends.append(int(m.group(2)))
+
+    # 09-20 / 16- / 09-
+    for m in re.finditer(r"(?<![0-9.,])([0-2]\d)\s*[-–]\s*([0-2]\d)?(?![0-9])", n):
+        a = _two_digit_year(int(m.group(1)))
+        if a:
+            starts.append(a)
+        if m.group(2):
+            b = _two_digit_year(int(m.group(2)))
+            if b:
+                ends.append(b)
+
+    # одиночный полный год: «2021», «2018»
+    for m in re.finditer(r"(?<!\d)(20\d{2}|19\d{2})(?!\d)", n):
+        y = int(m.group(1))
+        starts.append(y)
+        ends.append(y)
+
+    # одиночный короткий год у края/после пробела: «Соната 09», « 09 #»
+    for m in re.finditer(r"(?:^|[\s,])([0-2]\d)(?=\s*[#@,]|$)", n):
+        a = _two_digit_year(int(m.group(1)))
+        if a and 1995 <= a <= 2030:
+            starts.append(a)
+
+    if not starts:
+        return None, None
+    yf = min(starts)
+    yt = max(ends) if ends else None
+    # если только «2018-» без конца — yearTo = None (и новее)
+    if yt is not None and yt < yf:
+        yt = yf
+    return yf, yt
+
+
 def make_id(oem: str, used: set[str]) -> str:
     base = re.sub(r"[^a-zA-Z0-9]+", "-", oem).strip("-").lower() or "p"
     cid = base
@@ -294,21 +348,25 @@ def build_products(rows: list[tuple[str, str, int, int]]) -> list[dict]:
     for art, name, price, stock in rows:
         brand, model = detect_brand_model(name)
         cat, image = detect_category_image(name)
-        products.append(
-            {
-                "id": make_id(art, used),
-                "name": clean_name(name),
-                "brand": brand,
-                "model": model,
-                "category": cat,
-                "price": price,
-                "oem": art,
-                "stock": stock,
-                "desc": make_desc(name, brand, stock),
-                "image": image,
-                "popular": False,
-            }
-        )
+        yf, yt = parse_years(name)
+        item: dict = {
+            "id": make_id(art, used),
+            "name": clean_name(name),
+            "brand": brand,
+            "model": model,
+            "category": cat,
+            "price": price,
+            "oem": art,
+            "stock": stock,
+            "desc": make_desc(name, brand, stock),
+            "image": image,
+            "popular": False,
+        }
+        if yf is not None:
+            item["yearFrom"] = yf
+        if yt is not None:
+            item["yearTo"] = yt
+        products.append(item)
 
     # mark ~80 hits: high stock, reasonable price
     scored = sorted(products, key=lambda p: (-p["stock"], p["price"]))

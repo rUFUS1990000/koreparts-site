@@ -14,6 +14,7 @@ import {
   MODELS,
   PRODUCTS,
   priceRange,
+  YEAR_OPTIONS,
   type CatalogFilters,
 } from "@/lib/products";
 import type { BrandId, CategoryId } from "@/lib/types";
@@ -27,6 +28,7 @@ export function CatalogClient() {
   const [q, setQ] = useState(sp.get("q") ?? "");
   const [brand, setBrand] = useState(sp.get("brand") ?? "");
   const [model, setModel] = useState(sp.get("model") ?? "");
+  const [year, setYear] = useState(sp.get("year") ?? "");
   const [category, setCategory] = useState(sp.get("category") ?? "");
   const [minPrice, setMinPrice] = useState(sp.get("min") ?? "");
   const [maxPrice, setMaxPrice] = useState(sp.get("max") ?? "");
@@ -51,6 +53,7 @@ export function CatalogClient() {
       q,
       brand: brand || undefined,
       model: model || undefined,
+      year: year ? Number(year) : undefined,
       category: category || undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -59,13 +62,25 @@ export function CatalogClient() {
     if (inStock) list = list.filter((p) => p.stock > 0);
     if (onlyHits) list = list.filter((p) => p.popular);
     return list;
-  }, [q, brand, model, category, minPrice, maxPrice, sort, inStock, onlyHits]);
+  }, [
+    q,
+    brand,
+    model,
+    year,
+    category,
+    minPrice,
+    maxPrice,
+    sort,
+    inStock,
+    onlyHits,
+  ]);
 
   function pushState(patch: Record<string, string | undefined>) {
     const next = {
       q,
       brand,
       model,
+      year,
       category,
       min: minPrice,
       max: maxPrice,
@@ -77,6 +92,7 @@ export function CatalogClient() {
 
     if ("brand" in patch) setBrand(patch.brand ?? "");
     if ("model" in patch) setModel(patch.model ?? "");
+    if ("year" in patch) setYear(patch.year ?? "");
     if ("category" in patch) setCategory(patch.category ?? "");
     if ("q" in patch && patch.q !== undefined) setQ(patch.q);
     if ("min" in patch && patch.min !== undefined) setMinPrice(patch.min);
@@ -90,6 +106,7 @@ export function CatalogClient() {
     if (next.q) params.set("q", next.q);
     if (next.brand) params.set("brand", next.brand);
     if (next.model) params.set("model", next.model);
+    if (next.year) params.set("year", next.year);
     if (next.category) params.set("category", next.category);
     if (next.min) params.set("min", next.min);
     if (next.max) params.set("max", next.max);
@@ -105,6 +122,7 @@ export function CatalogClient() {
       q,
       brand,
       model,
+      year,
       category,
       min: minPrice,
       max: maxPrice,
@@ -118,6 +136,7 @@ export function CatalogClient() {
     setQ("");
     setBrand("");
     setModel("");
+    setYear("");
     setCategory("");
     setMinPrice("");
     setMaxPrice("");
@@ -181,6 +200,12 @@ export function CatalogClient() {
                 <span className="text-[var(--text-h)]">{activeCat.title}</span>
               </>
             ) : null}
+            {year ? (
+              <>
+                {" / "}
+                <span className="text-[var(--text-h)]">{year} г.</span>
+              </>
+            ) : null}
           </nav>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-h)] md:text-3xl">
             {activeBrand
@@ -191,14 +216,22 @@ export function CatalogClient() {
                           ?.title ?? model
                       }`
                     : ""
-                }`
+                }${year ? `, ${year}` : ""}`
               : activeCat
                 ? activeCat.title
-                : "Каталог запчастей"}
+                : year
+                  ? `Запчасти на ${year} год`
+                  : "Каталог запчастей"}
           </h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             Найдено:{" "}
             <b className="text-[var(--text-h)]">{products.length}</b>
+            {year ? (
+              <span className="text-[var(--text-muted)]">
+                {" "}
+                · год авто {year}
+              </span>
+            ) : null}
           </p>
         </div>
       </div>
@@ -411,6 +444,27 @@ export function CatalogClient() {
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="block space-y-1.5 text-sm">
+            <span className="text-[var(--text-muted)]">Год выпуска авто</span>
+            <select
+              className="select"
+              value={year}
+              onChange={(e) => pushState({ year: e.target.value })}
+            >
+              <option value="">Все годы</option>
+              {YEAR_OPTIONS.map((y) => (
+                <option key={y} value={String(y)}>
+                  {y} год
+                </option>
+              ))}
+            </select>
+            {year ? (
+              <span className="mt-1 block text-[11px] text-[var(--text-muted)]">
+                Показаны детали, подходящие на {year} г.
+              </span>
+            ) : null}
           </label>
 
           <div className="grid grid-cols-2 gap-2">

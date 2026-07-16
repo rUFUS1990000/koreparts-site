@@ -153,9 +153,35 @@ export interface CatalogFilters {
   brand?: string;
   model?: string;
   category?: string;
+  /** Год выпуска авто — показать подходящие запчасти */
+  year?: number;
   minPrice?: number;
   maxPrice?: number;
   sort?: "price-asc" | "price-desc" | "name" | "popular";
+}
+
+/** Годы для селекта (от новых к старым) */
+export const YEAR_OPTIONS: number[] = Array.from(
+  { length: 2026 - 1998 + 1 },
+  (_, i) => 2026 - i,
+);
+
+/** Подходит ли товар к выбранному году авто */
+export function productFitsYear(p: Product, year: number): boolean {
+  if (p.yearFrom == null && p.yearTo == null) return true;
+  const from = p.yearFrom ?? 1990;
+  const to = p.yearTo ?? 2030;
+  return year >= from && year <= to;
+}
+
+export function yearLabel(p: Product): string | null {
+  if (p.yearFrom == null && p.yearTo == null) return null;
+  if (p.yearFrom != null && p.yearTo != null) {
+    if (p.yearFrom === p.yearTo) return String(p.yearFrom);
+    return `${p.yearFrom}–${p.yearTo}`;
+  }
+  if (p.yearFrom != null) return `${p.yearFrom}+`;
+  return `до ${p.yearTo}`;
 }
 
 export function filterProducts(f: CatalogFilters): Product[] {
@@ -165,6 +191,9 @@ export function filterProducts(f: CatalogFilters): Product[] {
   if (f.brand) list = list.filter((p) => p.brand === f.brand);
   if (f.model) list = list.filter((p) => p.model === f.model);
   if (f.category) list = list.filter((p) => p.category === f.category);
+  if (f.year != null && !Number.isNaN(f.year)) {
+    list = list.filter((p) => productFitsYear(p, f.year!));
+  }
   if (f.minPrice != null && !Number.isNaN(f.minPrice)) {
     list = list.filter((p) => p.price >= f.minPrice!);
   }
