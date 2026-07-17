@@ -66,10 +66,12 @@ npm run build:static
 | Корзина, оформление, кабинет | ✅ (в браузере, localStorage) |
 | Заявка, VIN (демо) | ✅ |
 | Логотип, Telegram, контакты | ✅ |
-| ИИ-чат | ❌ нет сервера — предложит Telegram |
+| ИИ-чат | ⚠️ нужен Node: Vercel API или VPS (см. DEPLOY_AI_REGRU.md) |
 | Заявки / заказы на email | ✅ через Web3Forms (ключ вшит при сборке) |
 
-ИИ можно оставить на **Vercel** (с `XAI_API_KEY`) или на **VPS reg.ru** с Node.js.
+**ИИ на reg.ru:** обычный shared-хостинг API не тянет.  
+Рекомендация: сайт static на reg.ru + `NEXT_PUBLIC_CHAT_API_URL` → Vercel.  
+Подробно: **[DEPLOY_AI_REGRU.md](./DEPLOY_AI_REGRU.md)**.
 
 ---
 

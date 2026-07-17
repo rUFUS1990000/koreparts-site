@@ -44,7 +44,13 @@ export function AiAssistant() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      // На reg.ru (static) /api/chat нет — можно указать внешний URL (Vercel):
+      // NEXT_PUBLIC_CHAT_API_URL=https://ваш-проект.vercel.app/api/chat
+      const apiBase =
+        (process.env.NEXT_PUBLIC_CHAT_API_URL || "").trim().replace(/\/$/, "") ||
+        "/api/chat";
+
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +66,7 @@ export function AiAssistant() {
           {
             role: "assistant",
             content:
-              "ИИ на этом хостинге недоступен. Напишите в Telegram @KorePartsBot или оставьте заявку /request — ответим вручную.",
+              "ИИ сейчас недоступен на этом хостинге.\n\nНужен Node/Vercel с ключом XAI_API_KEY или переменная NEXT_PUBLIC_CHAT_API_URL.\n\nПока напишите в Telegram @KorePartsBot или оставьте заявку /request.",
           },
         ]);
         return;

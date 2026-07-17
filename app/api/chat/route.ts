@@ -6,6 +6,42 @@ export const runtime = "nodejs";
 
 type ChatMessage = { role: "user" | "assistant" | "system"; content: string };
 
+/** CORS: сайт на reg.ru (koreparts.ru) может дергать API на Vercel */
+function corsHeaders(req: Request): HeadersInit {
+  const origin = req.headers.get("origin") || "";
+  const allowed = [
+    "https://koreparts.ru",
+    "https://www.koreparts.ru",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ];
+  const allow =
+    allowed.includes(origin) ||
+    origin.endsWith(".vercel.app") ||
+    origin.endsWith(".koreparts.ru");
+  return {
+    "Access-Control-Allow-Origin": allow ? origin : "https://koreparts.ru",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+function json(
+  req: Request,
+  body: unknown,
+  init?: { status?: number },
+) {
+  return NextResponse.json(body, {
+    status: init?.status ?? 200,
+    headers: corsHeaders(req),
+  });
+}
+
+export async function OPTIONS(req: Request) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
 const SYSTEM = `Ты — ИИ-помощник интернет-магазина KoreParts (запчасти Kia, Hyundai, Genesis, SsangYong).
 Отвечай по-русски, кратко и по делу. Помогай с подбором деталей, OEM, категориями, доставкой.
 
@@ -32,9 +68,9 @@ function catalogContext(userText: string): string {
 }
 
 /** Проверка: есть ли ключ (без раскрытия значения) */
-export async function GET() {
+export async function GET(req: Request) {
   const hasKey = Boolean((process.env.XAI_API_KEY || "").trim());
-  return NextResponse.json({
+  return json(req, {
     ok: true,
     hasXaiKey: hasKey,
     hint: hasKey
@@ -48,27 +84,22 @@ export async function POST(req: Request) {
     const body = (await req.json()) as { messages?: ChatMessage[] };
     const messages = body.messages ?? [];
     if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: "Пустое сообщение" },
-        { status: 400 },
-      );
+      return json(req, { error: "Пустое сообщение" }, { status: 400 });
     }
 
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     if (!lastUser?.content?.trim()) {
-      return NextResponse.json(
-        { error: "Нужен текст пользователя" },
-        { status: 400 },
-      );
+      return json(req, { error: "Нужен текст пользователя" }, { status: 400 });
     }
 
     const apiKey = (process.env.XAI_API_KEY || "").trim();
     if (!apiKey) {
-      return NextResponse.json(
+      return json(
+        req,
         {
           error: "no_api_key",
           reply:
-            "Ключ ИИ на Vercel ещё не подключён.\n\n1) Vercel → проект koreparts-site → Environment Variables\n2) Key: XAI_API_KEY  (именно так)\n3) Value: ваш ключ xai-...\n4) Environments: Production + Preview\n5) Save → Deployments → Redeploy\n\nПока можно написать в Telegram @KorePartsBot или оставить заявку /request",
+            "Ключ ИИ на сервере ещё не подключён.\n\n1) Vercel → Environment Variables\n2) Key: XAI_API_KEY\n3) Value: xai-... с https://console.x.ai\n4) Redeploy\n\nПока Telegram @KorePartsBot или заявка /request",
         },
         { status: 503 },
       );
@@ -102,7 +133,8 @@ export async function POST(req: Request) {
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
       console.error("xAI error", res.status, errText.slice(0, 500));
-      return NextResponse.json(
+      return json(
+        req,
         {
           error: "upstream",
           reply:
@@ -119,10 +151,11 @@ export async function POST(req: Request) {
       data.choices?.[0]?.message?.content?.trim() ||
       "Не удалось получить ответ. Попробуйте ещё раз или напишите в Telegram.";
 
-    return NextResponse.json({ reply });
+    return json(req, { reply });
   } catch (e) {
     console.error("chat route", e);
-    return NextResponse.json(
+    return json(
+      req,
       {
         error: "server",
         reply:
