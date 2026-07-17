@@ -7,7 +7,7 @@
 /** Public access key (Web3Forms). Env перекрывает fallback. */
 export const WEB3FORMS_ACCESS_KEY =
   process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY?.trim() ||
-  "6a2f894a-0873-47f2-bd53-bf82fc68a2ef";
+  "7feebae0-b199-4b4b-9c5e-bb897061e0a0";
 
 export const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
