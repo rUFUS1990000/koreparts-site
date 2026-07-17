@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useCart } from "@/lib/cart-context";
-import { TELEGRAM_URL } from "@/lib/constants";
+import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import {
   brandTitle,
   formatPrice,
@@ -297,7 +297,15 @@ export default function AccountPage() {
                   rel="noopener noreferrer"
                   className="btn btn-primary btn-sm w-full"
                 >
-                  Написать в Telegram
+                  Написать в бот
+                </a>
+                <a
+                  href={TELEGRAM_CHANNEL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-sm w-full"
+                >
+                  📢 Канал t.me/KoreParts
                 </a>
               </div>
             </div>

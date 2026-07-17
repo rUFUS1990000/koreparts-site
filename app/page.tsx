@@ -4,7 +4,7 @@ import { CategoryGrid } from "@/components/CategoryGrid";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ProductCard } from "@/components/ProductCard";
 import { VinLookup } from "@/components/VinLookup";
-import { TELEGRAM_URL } from "@/lib/constants";
+import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import { BRANDS, popularProducts, PRODUCTS } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -106,7 +106,15 @@ export default function HomePage() {
               rel="noreferrer"
               className="btn btn-primary"
             >
-              Telegram
+              Telegram-бот
+            </a>
+            <a
+              href={TELEGRAM_CHANNEL_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-ghost"
+            >
+              📢 t.me/KoreParts
             </a>
           </div>
         </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   EMAIL_DISPLAY,
+  TELEGRAM_CHANNEL_URL,
   TELEGRAM_URL,
   WORK_HOURS,
 } from "@/lib/constants";
@@ -31,13 +32,32 @@ export default function ContactsPage() {
         >
           <div className="text-3xl">✈️</div>
           <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
-            Telegram @KorePartsBot
+            Telegram-бот @KorePartsBot
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
             Каталог, корзина и заказ в мессенджере. Быстрый ответ по наличию.
           </p>
           <span className="mt-4 inline-flex text-sm font-semibold text-[var(--blue-bright)]">
             Открыть бота →
+          </span>
+        </a>
+
+        <a
+          href={TELEGRAM_CHANNEL_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="card card-hover block p-6 md:p-8"
+        >
+          <div className="text-3xl">📢</div>
+          <h2 className="mt-3 text-xl font-bold text-[var(--text-h)]">
+            Канал t.me/KoreParts
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+            Новости, акции, подборки запчастей и полезные советы по корейским
+            авто.
+          </p>
+          <span className="mt-4 inline-flex text-sm font-semibold text-[var(--blue-bright)]">
+            Подписаться →
           </span>
         </a>
 

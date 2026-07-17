@@ -16,17 +16,20 @@ import type { Product } from "@/lib/types";
 import { CategoryIcon } from "./CategoryIcons";
 
 export function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
-  const [added, setAdded] = useState(false);
+  const { add, getQty } = useCart();
+  const [flashQty, setFlashQty] = useState<number | null>(null);
+  const qty = getQty(product.id);
+  const shownQty = flashQty ?? qty;
   const cat = CATEGORIES[product.category];
 
   function onAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (product.stock <= 0) return;
+    const next = (flashQty ?? qty) + 1;
     add(product.id, 1);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1200);
+    setFlashQty(next);
+    window.setTimeout(() => setFlashQty(null), 1200);
   }
 
   return (
@@ -91,10 +94,21 @@ export function ProductCard({ product }: { product: Product }) {
             <button
               type="button"
               onClick={onAdd}
-              className={`btn btn-sm ${added ? "btn-accent" : "btn-primary"}`}
+              className={`btn btn-sm ${flashQty != null || shownQty > 0 ? "btn-accent" : "btn-primary"}`}
               disabled={product.stock <= 0}
+              title={
+                shownQty > 0
+                  ? `В корзине ${shownQty} шт. Нажмите, чтобы добавить ещё`
+                  : "Добавить в корзину"
+              }
             >
-              {product.stock <= 0 ? "Нет" : added ? "✓" : "В корзину"}
+              {product.stock <= 0
+                ? "Нет"
+                : flashQty != null
+                  ? `✓ ${flashQty}`
+                  : shownQty > 0
+                    ? `×${shownQty}`
+                    : "В корзину"}
             </button>
           </div>
           <a

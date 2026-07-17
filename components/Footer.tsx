@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   EMAIL_DISPLAY,
+  TELEGRAM_CHANNEL_URL,
   TELEGRAM_URL,
   WORK_HOURS,
 } from "@/lib/constants";
@@ -33,7 +34,15 @@ export function Footer() {
               rel="noopener noreferrer"
               className="btn btn-primary btn-sm"
             >
-              Telegram
+              Telegram-бот
+            </a>
+            <a
+              href={TELEGRAM_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost btn-sm"
+            >
+              Канал
             </a>
           </div>
         </div>
@@ -53,7 +62,7 @@ export function Footer() {
           </p>
           <ul className="mt-4 space-y-2 text-sm text-[var(--text)]">
             <li>
-              <span className="text-[var(--text-muted)]">Telegram: </span>
+              <span className="text-[var(--text-muted)]">Бот: </span>
               <a
                 href={TELEGRAM_URL}
                 target="_blank"
@@ -61,6 +70,17 @@ export function Footer() {
                 className="font-semibold text-[var(--blue-bright)] hover:underline"
               >
                 @KorePartsBot
+              </a>
+            </li>
+            <li>
+              <span className="text-[var(--text-muted)]">Канал: </span>
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[var(--blue-bright)] hover:underline"
+              >
+                t.me/KoreParts
               </a>
             </li>
             <li>
@@ -153,12 +173,22 @@ export function Footer() {
               Добавьте товары в корзину или оставьте заявку — менеджер
               подтвердит наличие и сроки.
             </p>
-            <Link
-              href="/checkout"
-              className="mt-3 inline-flex text-sm font-semibold text-[var(--blue-bright)] hover:underline"
-            >
-              Оформить заказ →
-            </Link>
+            <div className="mt-3 flex flex-col gap-1.5">
+              <Link
+                href="/checkout"
+                className="inline-flex text-sm font-semibold text-[var(--blue-bright)] hover:underline"
+              >
+                Оформить заказ →
+              </Link>
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex text-sm font-semibold text-[var(--blue-bright)] hover:underline"
+              >
+                Канал t.me/KoreParts →
+              </a>
+            </div>
           </div>
         </div>
       </div>

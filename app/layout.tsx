@@ -6,6 +6,7 @@ import { Providers } from "@/components/Providers";
 import {
   SITE_NAME,
   SITE_TAGLINE,
+  TELEGRAM_CHANNEL_URL,
   TELEGRAM_URL,
   THEME_INIT_SCRIPT,
 } from "@/lib/constants";
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Интернет-магазин автозапчастей для корейских автомобилей: фильтры, тормоза, подвеска, электрика. 1400+ позиций с OEM. Заявка на подбор, доставка по РФ. Telegram @KorePartsBot.",
+    "Интернет-магазин автозапчастей для корейских автомобилей: фильтры, тормоза, подвеска, электрика. 1400+ позиций с OEM. Заявка на подбор, доставка по РФ. Канал t.me/KoreParts · бот @KorePartsBot.",
   applicationName: SITE_NAME,
   keywords: [
     "KoreParts",
@@ -88,7 +89,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
   other: {
-    "telegram:channel": TELEGRAM_URL,
+    "telegram:channel": TELEGRAM_CHANNEL_URL,
   },
 };
 
@@ -103,7 +104,7 @@ export default function RootLayout({
     name: SITE_NAME,
     description: SITE_TAGLINE,
     url: siteUrl,
-    sameAs: [TELEGRAM_URL],
+    sameAs: [TELEGRAM_CHANNEL_URL, TELEGRAM_URL],
     priceRange: "₽₽",
     areaServed: "RU",
   };

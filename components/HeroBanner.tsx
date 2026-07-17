@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { TELEGRAM_CHANNEL_URL } from "@/lib/constants";
 import {
   brandTitle,
   CATEGORIES,
@@ -48,6 +49,14 @@ export function HeroBanner() {
               <Link href="/request" className="btn btn-accent">
                 Оставить заявку
               </Link>
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost"
+              >
+                📢 t.me/KoreParts
+              </a>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--text-muted)]">

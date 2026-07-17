@@ -14,8 +14,10 @@ export function AddToCartButton({
   className?: string;
   label?: string;
 }) {
-  const { add } = useCart();
-  const [done, setDone] = useState(false);
+  const { add, getQty } = useCart();
+  const [flashQty, setFlashQty] = useState<number | null>(null);
+  const qty = getQty(productId);
+  const shownQty = flashQty ?? qty;
 
   return (
     <button
@@ -23,12 +25,19 @@ export function AddToCartButton({
       className={className}
       disabled={disabled}
       onClick={() => {
+        const next = (flashQty ?? qty) + 1;
         add(productId, 1);
-        setDone(true);
-        setTimeout(() => setDone(false), 1400);
+        setFlashQty(next);
+        window.setTimeout(() => setFlashQty(null), 1400);
       }}
     >
-      {disabled ? "Нет в наличии" : done ? "✓ Добавлено" : label}
+      {disabled
+        ? "Нет в наличии"
+        : flashQty != null
+          ? `✓ В корзине ${flashQty} шт.`
+          : shownQty > 0
+            ? `В корзине ${shownQty} · +1`
+            : label}
     </button>
   );
 }

@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { telegramRequestUrl, TELEGRAM_URL } from "@/lib/constants";
+import {
+  TELEGRAM_CHANNEL_URL,
+  telegramRequestUrl,
+  TELEGRAM_URL,
+} from "@/lib/constants";
 import { saveRequest, type SavedRequest } from "@/lib/storage";
 
 const empty = {
@@ -237,16 +241,27 @@ export default function RequestPage() {
           <div className="card p-5">
             <h2 className="font-bold text-[var(--text-h)]">Telegram</h2>
             <p className="mt-2 text-sm text-[var(--text-muted)]">
-              Можно сразу написать менеджеру — тот же каталог и быстрый ответ.
+              Напишите менеджеру в боте или подпишитесь на канал с новостями и
+              акциями.
             </p>
-            <a
-              href={TELEGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-sm mt-4"
-            >
-              @KorePartsBot
-            </a>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href={TELEGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm"
+              >
+                @KorePartsBot
+              </a>
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost btn-sm"
+              >
+                t.me/KoreParts
+              </a>
+            </div>
           </div>
           <div className="card p-5">
             <h2 className="font-bold text-[var(--text-h)]">Личный кабинет</h2>

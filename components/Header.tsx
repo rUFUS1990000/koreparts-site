@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
-import { TELEGRAM_URL } from "@/lib/constants";
+import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import { MAIN_NAV } from "@/lib/nav";
 import { CatalogsMenu } from "./CatalogsMenu";
 import { ThemeToggle } from "./ThemeToggle";
@@ -57,6 +57,20 @@ export function Header() {
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
             <ThemeToggle />
+
+            <a
+              href={TELEGRAM_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost btn-sm hidden md:inline-flex"
+              title="Telegram-канал KoreParts"
+              aria-label="Telegram-канал KoreParts"
+            >
+              📢
+              <span className="ml-1.5 hidden font-semibold lg:inline">
+                Канал
+              </span>
+            </a>
 
             <Link
               href="/request"
@@ -149,7 +163,16 @@ export function Header() {
                 className="btn btn-primary"
                 onClick={() => setOpen(false)}
               >
-                Telegram
+                Telegram-бот
+              </a>
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost col-span-2"
+                onClick={() => setOpen(false)}
+              >
+                📢 Канал t.me/KoreParts
               </a>
             </div>
           </div>
