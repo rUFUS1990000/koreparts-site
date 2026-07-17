@@ -1,26 +1,29 @@
-import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
   /** Высота логотипа в px */
   height?: number;
   className?: string;
-  priority?: boolean;
   /** null — без ссылки */
   href?: string | null;
   /** header — компактный файл, full — полный логотип */
   variant?: "header" | "full";
   /** Тёмный фон под лого (белый текст читается и в светлой теме) */
   withBg?: boolean;
+  /** для совместимости, игнорируется */
+  priority?: boolean;
 };
 
-/** Соотношение сторон исходника ~3:1 */
-const ASPECT = 1400 / 467;
+/** Соотношение сторон исходника ≈ 3:1 */
+const ASPECT = 2172 / 724;
 
+/**
+ * Логотип KoreParts.
+ * Обычный <img> — без next/image, чтобы стабильно работало на Vercel и static export.
+ */
 export function SiteLogo({
   height = 40,
   className = "",
-  priority = false,
   href = "/",
   variant = "header",
   withBg = true,
@@ -30,21 +33,26 @@ export function SiteLogo({
 
   const shell = (
     <span
-      className={`inline-flex shrink-0 items-center overflow-hidden transition group-hover:opacity-90 ${
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden ${
         withBg
-          ? "rounded-xl bg-[#05070d] px-2 py-1 ring-1 ring-white/10 shadow-sm"
+          ? "rounded-xl bg-[#05070d] px-2.5 py-1.5 ring-1 ring-white/10 shadow-sm"
           : ""
       } ${className}`}
     >
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={src}
         alt="KoreParts — запчасти Kia, Hyundai, Genesis"
         width={width}
         height={height}
-        priority={priority}
-        className="block h-auto w-auto object-contain object-left"
-        style={{ height, width: "auto", maxWidth: width }}
-        sizes={`${width}px`}
+        decoding="async"
+        fetchPriority={variant === "header" ? "high" : "auto"}
+        className="block object-contain object-left"
+        style={{
+          width,
+          height,
+          maxWidth: "100%",
+        }}
       />
     </span>
   );
@@ -54,7 +62,7 @@ export function SiteLogo({
   return (
     <Link
       href={href}
-      className="group shrink-0"
+      className="group shrink-0 transition hover:opacity-90"
       aria-label="KoreParts — на главную"
     >
       {shell}

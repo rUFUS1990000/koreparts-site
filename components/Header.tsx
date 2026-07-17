@@ -24,7 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50">
       <div className="glass border-b border-[var(--border)] shadow-sm">
         <div className="container-kp flex h-[4rem] items-center gap-3 md:h-[4.25rem] md:gap-5">
-          <SiteLogo height={36} priority />
+          <SiteLogo height={40} priority />
 
           <nav className="ml-2 hidden items-center gap-0.5 lg:flex">
             <CatalogsMenu />

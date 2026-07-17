@@ -1,6 +1,13 @@
 /* KoreParts PWA service worker — basic offline shell */
-const CACHE = "koreparts-v1";
-const ASSETS = ["/", "/catalog", "/favicon.svg", "/site.webmanifest"];
+const CACHE = "koreparts-v2";
+const ASSETS = [
+  "/",
+  "/catalog",
+  "/favicon.svg",
+  "/site.webmanifest",
+  "/logo.png",
+  "/logo-header.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
