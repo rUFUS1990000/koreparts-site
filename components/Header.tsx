@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context";
 import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import { MAIN_NAV } from "@/lib/nav";
 import { CatalogsMenu } from "./CatalogsMenu";
+import { SiteLogo } from "./SiteLogo";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
@@ -23,20 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50">
       <div className="glass border-b border-[var(--border)] shadow-sm">
         <div className="container-kp flex h-[4rem] items-center gap-3 md:h-[4.25rem] md:gap-5">
-          <Link
-            href="/"
-            className="group flex shrink-0 items-center gap-2.5 font-bold tracking-tight"
-          >
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-[#3b82f6] via-[#2563eb] to-[#e11d48] text-xs font-black text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-600/20 transition group-hover:scale-105">
-              KP
-            </span>
-            <span className="text-lg text-[var(--text-h)]">
-              Kore
-              <span className="bg-gradient-to-r from-[var(--blue-bright)] to-[var(--red)] bg-clip-text text-transparent">
-                Parts
-              </span>
-            </span>
-          </Link>
+          <SiteLogo height={36} priority />
 
           <nav className="ml-2 hidden items-center gap-0.5 lg:flex">
             <CatalogsMenu />

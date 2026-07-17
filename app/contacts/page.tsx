@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteLogo } from "@/components/SiteLogo";
 import {
   EMAIL_DISPLAY,
   TELEGRAM_CHANNEL_URL,
@@ -122,12 +123,10 @@ export default function ContactsPage() {
               СТО. Для опта напишите в Telegram с пометкой «опт».
             </p>
           </div>
-          <div className="flex items-center justify-center bg-gradient-to-br from-[var(--blue-dim)] to-[var(--red-dim)] p-8 text-center">
-            <div>
-              <div className="text-4xl font-black tracking-tight text-[var(--text-h)]">
-                KoreParts
-              </div>
-              <div className="mt-1 text-sm text-[var(--text-muted)]">
+          <div className="flex items-center justify-center bg-gradient-to-br from-[#05070d] via-[#0b1220] to-[#1a0a12] p-8 text-center">
+            <div className="flex flex-col items-center gap-3">
+              <SiteLogo height={72} variant="full" href={null} withBg={false} />
+              <div className="text-sm text-white/70">
                 Kia · Hyundai · Genesis · SsangYong
               </div>
             </div>

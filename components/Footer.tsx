@@ -9,6 +9,7 @@ import { MAIN_NAV } from "@/lib/nav";
 import { BRANDS, CATEGORIES, PRODUCTS } from "@/lib/products";
 import type { BrandId, CategoryId } from "@/lib/types";
 import { CategoryIcon } from "./CategoryIcons";
+import { SiteLogo } from "./SiteLogo";
 
 export function Footer() {
   return (
@@ -50,11 +51,8 @@ export function Footer() {
 
       <div className="container-kp grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <div className="mb-3 text-xl font-bold text-[var(--text-h)]">
-            Kore
-            <span className="bg-gradient-to-r from-[var(--blue-bright)] to-[var(--red)] bg-clip-text text-transparent">
-              Parts
-            </span>
+          <div className="mb-4">
+            <SiteLogo height={48} variant="full" href="/" />
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-[var(--text-muted)]">
             Интернет-магазин запчастей для корейских автомобилей.{" "}

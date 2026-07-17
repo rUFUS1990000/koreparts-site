@@ -76,6 +76,14 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
       "Каталог запчастей Kia, Hyundai, Genesis, SsangYong. OEM, заявка, доставка по России.",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1400,
+        height: 467,
+        alt: "KoreParts",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
