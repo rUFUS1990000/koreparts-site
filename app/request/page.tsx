@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import {
   TELEGRAM_CHANNEL_URL,
   telegramRequestUrl,
   TELEGRAM_URL,
 } from "@/lib/constants";
-import { saveRequest, type SavedRequest } from "@/lib/storage";
+import { loadProfile, saveRequest, type SavedRequest } from "@/lib/storage";
 import {
   formatRequestMessage,
   submitWeb3Form,
@@ -28,12 +29,28 @@ const empty = {
   comment: "",
 };
 
-export default function RequestPage() {
+function RequestForm() {
+  const search = useSearchParams();
   const [form, setForm] = useState(empty);
   const [sent, setSent] = useState<SavedRequest | null>(null);
   const [loading, setLoading] = useState(false);
   const [mailOk, setMailOk] = useState(false);
   const [mailError, setMailError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const p = loadProfile();
+    setForm((f) => ({
+      ...f,
+      name: f.name || p.name || "",
+      phone: f.phone || p.phone || "",
+      email: f.email || p.email || "",
+      city: f.city || p.city || "",
+      brand: search.get("brand") || f.brand || p.carBrand || "",
+      model: search.get("model") || f.model || p.carModel || "",
+      year: search.get("year") || f.year || p.carYear || "",
+      vin: (search.get("vin") || f.vin || p.vin || "").toUpperCase(),
+    }));
+  }, [search]);
 
   function set<K extends keyof typeof empty>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -371,5 +388,19 @@ export default function RequestPage() {
         </aside>
       </div>
     </div>
+  );
+}
+
+export default function RequestPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container-kp py-16 text-center text-[var(--text-muted)]">
+          Загрузка формы…
+        </div>
+      }
+    >
+      <RequestForm />
+    </Suspense>
   );
 }

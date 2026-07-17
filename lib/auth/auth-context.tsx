@@ -48,6 +48,14 @@ type AuthContextValue = {
   completeOAuthFromHash: (
     hash: string,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  updateAccount: (patch: {
+    name?: string;
+    phone?: string;
+  }) => Promise<{ ok: true } | { ok: false; error: string }>;
+  changePassword: (
+    current: string,
+    next: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
   logout: () => void;
   refresh: () => void;
 };
@@ -241,6 +249,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [loginWithOAuthProfile],
   );
 
+  const updateAccount = useCallback(
+    async (patch: { name?: string; phone?: string }) => {
+      const s = loadSession();
+      if (!s) return { ok: false as const, error: "Нет сессии" };
+      const existing = findUserById(s.userId);
+      if (!existing) return { ok: false as const, error: "Пользователь не найден" };
+      const next = upsertUser({
+        ...existing,
+        name: patch.name?.trim() || existing.name,
+        phone: patch.phone !== undefined ? patch.phone.trim() : existing.phone,
+      });
+      const sess = createSession(next);
+      syncProfileFromUser(next);
+      setSession(sess);
+      setUser(toPublic(next));
+      return { ok: true as const };
+    },
+    [],
+  );
+
+  const changePassword = useCallback(
+    async (current: string, nextPass: string) => {
+      const s = loadSession();
+      if (!s) return { ok: false as const, error: "Нет сессии" };
+      const existing = findUserById(s.userId);
+      if (!existing || existing.provider !== "email") {
+        return {
+          ok: false as const,
+          error: "Смена пароля только для входа по email",
+        };
+      }
+      if (!existing.passwordHash || !existing.passwordSalt) {
+        return { ok: false as const, error: "Пароль не задан" };
+      }
+      const ok = await verifyPassword(
+        current,
+        existing.passwordSalt,
+        existing.passwordHash,
+      );
+      if (!ok) return { ok: false as const, error: "Неверный текущий пароль" };
+      const pErr = validatePassword(nextPass);
+      if (pErr) return { ok: false as const, error: pErr };
+      const { hash, salt } = await hashPassword(nextPass);
+      upsertUser({
+        ...existing,
+        passwordHash: hash,
+        passwordSalt: salt,
+      });
+      return { ok: true as const };
+    },
+    [],
+  );
+
   const logout = useCallback(() => {
     clearSession();
     setSession(null);
@@ -256,6 +317,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginWithEmail,
       loginWithOAuthProfile,
       completeOAuthFromHash,
+      updateAccount,
+      changePassword,
       logout,
       refresh,
     }),
@@ -267,6 +330,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginWithEmail,
       loginWithOAuthProfile,
       completeOAuthFromHash,
+      updateAccount,
+      changePassword,
       logout,
       refresh,
     ],

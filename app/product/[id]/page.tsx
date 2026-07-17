@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { CategoryIcon } from "@/components/CategoryIcons";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { ProductCard } from "@/components/ProductCard";
 import { telegramProductUrl } from "@/lib/constants";
 import {
@@ -191,6 +192,7 @@ export default async function ProductPage({ params }: Props) {
               disabled={product.stock <= 0}
               className="btn btn-primary"
             />
+            <FavoriteButton productId={product.id} />
             <Link href="/cart" className="btn btn-ghost">
               Корзина
             </Link>
