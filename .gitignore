@@ -20,6 +20,8 @@
 # production
 /build
 /dist
+/koreparts-regru.zip
+/.api-backup-static
 
 
 

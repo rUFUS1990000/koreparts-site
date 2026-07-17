@@ -1,6 +1,6 @@
 /**
  * Копирует статическую сборку Next (out/) → dist/
- * Запуск: STATIC_EXPORT=1 next build && node scripts/copy-to-dist.mjs
+ * Обычно вызывается из: npm run build:static
  * Для Vercel этот скрипт НЕ нужен.
  */
 import fs from "node:fs";
@@ -13,7 +13,7 @@ const dest = path.join(root, "dist");
 if (!fs.existsSync(src)) {
   console.error(
     "Папка out/ не найдена.\n" +
-      "Соберите так: set STATIC_EXPORT=1 && npx next build && node scripts/copy-to-dist.mjs",
+      "Соберите: npm run build:static",
   );
   process.exit(1);
 }
@@ -21,5 +21,25 @@ if (!fs.existsSync(src)) {
 fs.rmSync(dest, { recursive: true, force: true });
 fs.cpSync(src, dest, { recursive: true });
 
-console.log("✅ Готово: dist/ (static export)");
+// .htaccess: Next иногда не копирует dotfiles — подстрахуемся
+const htSrc = path.join(root, "public", ".htaccess");
+const htDest = path.join(dest, ".htaccess");
+if (fs.existsSync(htSrc) && !fs.existsSync(htDest)) {
+  fs.copyFileSync(htSrc, htDest);
+  console.log("  + скопирован .htaccess");
+}
+
+// Подсчёт
+function countFiles(dir) {
+  let n = 0;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) n += countFiles(p);
+    else n += 1;
+  }
+  return n;
+}
+
+const files = countFiles(dest);
+console.log(`✅ Готово: dist/ (${files} файлов, static export)`);
 

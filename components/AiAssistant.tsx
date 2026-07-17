@@ -51,6 +51,21 @@ export function AiAssistant() {
           messages: next.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
+
+      // Static hosting (reg.ru) — нет API, HTML 404
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok || !ct.includes("application/json")) {
+        setMessages((m) => [
+          ...m,
+          {
+            role: "assistant",
+            content:
+              "ИИ на этом хостинге недоступен. Напишите в Telegram @KorePartsBot или оставьте заявку /request — ответим вручную.",
+          },
+        ]);
+        return;
+      }
+
       const data = (await res.json()) as { reply?: string; error?: string };
       const reply =
         data.reply ||
@@ -62,7 +77,7 @@ export function AiAssistant() {
         {
           role: "assistant",
           content:
-            "Нет связи с сервером ИИ. На статическом хостинге нужен Node/Vercel с XAI_API_KEY, либо пишите в Telegram.",
+            "Нет связи с сервером ИИ. Напишите в Telegram @KorePartsBot или оставьте заявку.",
         },
       ]);
     } finally {

@@ -8,6 +8,11 @@ import {
   TELEGRAM_URL,
 } from "@/lib/constants";
 import { saveRequest, type SavedRequest } from "@/lib/storage";
+import {
+  formatRequestMessage,
+  submitWeb3Form,
+  WEB3FORMS_ACCESS_KEY,
+} from "@/lib/web3forms";
 
 const empty = {
   name: "",
@@ -25,13 +30,17 @@ const empty = {
 export default function RequestPage() {
   const [form, setForm] = useState(empty);
   const [sent, setSent] = useState<SavedRequest | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [mailOk, setMailOk] = useState<boolean | null>(null);
 
   function set<K extends keyof typeof empty>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (loading) return;
+
     const phoneDigits = form.phone.replace(/\D/g, "");
     if (form.name.trim().length < 2) {
       alert("Укажите имя");
@@ -45,14 +54,39 @@ export default function RequestPage() {
       alert("Укажите, какая деталь нужна");
       return;
     }
+
     const req: SavedRequest = {
       id: `REQ-${Date.now()}`,
       createdAt: new Date().toISOString(),
       status: "new",
       ...form,
     };
-    saveRequest(req);
-    setSent(req);
+
+    setLoading(true);
+    try {
+      const result = await submitWeb3Form({
+        subject: `Заявка KoreParts ${req.id}: ${form.partName}`,
+        name: form.name,
+        phone: form.phone,
+        message: formatRequestMessage(req),
+      });
+
+      if (result.ok) {
+        setMailOk(true);
+      } else if ("skipped" in result && result.skipped) {
+        setMailOk(null);
+      } else {
+        setMailOk(false);
+        const err = "error" in result ? result.error : "Ошибка отправки";
+        // всё равно сохраняем локально, но предупреждаем
+        console.warn(err);
+      }
+
+      saveRequest(req);
+      setSent(req);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent) {
@@ -65,8 +99,11 @@ export default function RequestPage() {
             Заявка {sent.id} принята
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
-            Сохранили в личном кабинете. Чтобы ускорить ответ — продублируйте
-            заявку в Telegram менеджеру.
+            {mailOk === true
+              ? "Заявка отправлена на почту менеджеру и сохранена в личном кабинете."
+              : mailOk === false
+                ? "Сохранили в личном кабинете. Отправка на почту не удалась — продублируйте в Telegram."
+                : "Сохранили в личном кабинете. Чтобы ускорить ответ — продублируйте заявку в Telegram."}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <a
@@ -98,6 +135,11 @@ export default function RequestPage() {
       <p className="section-sub mt-3">
         Не нашли деталь в каталоге или нужна помощь с подбором — заполните
         форму. Ответим в рабочее время, обычно в течение 15–30 минут.
+        {WEB3FORMS_ACCESS_KEY ? (
+          <span className="mt-1 block text-xs text-[var(--success)]">
+            Заявка уйдёт менеджеру на email.
+          </span>
+        ) : null}
       </p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -113,6 +155,7 @@ export default function RequestPage() {
                 onChange={(e) => set("name", e.target.value)}
                 placeholder="Как к вам обращаться"
                 required
+                disabled={loading}
               />
             </label>
             <label className="block text-sm">
@@ -125,6 +168,7 @@ export default function RequestPage() {
                 onChange={(e) => set("phone", e.target.value)}
                 placeholder="+7 (___) ___-__-__"
                 required
+                disabled={loading}
               />
             </label>
             <label className="block text-sm">
@@ -136,6 +180,7 @@ export default function RequestPage() {
                 value={form.city}
                 onChange={(e) => set("city", e.target.value)}
                 placeholder="Город доставки"
+                disabled={loading}
               />
             </label>
             <label className="block text-sm">
@@ -147,6 +192,7 @@ export default function RequestPage() {
                 value={form.year}
                 onChange={(e) => set("year", e.target.value)}
                 placeholder="2018"
+                disabled={loading}
               />
             </label>
             <label className="block text-sm">
@@ -158,6 +204,7 @@ export default function RequestPage() {
                 value={form.brand}
                 onChange={(e) => set("brand", e.target.value)}
                 placeholder="Kia, Hyundai…"
+                disabled={loading}
               />
             </label>
             <label className="block text-sm">
@@ -169,6 +216,7 @@ export default function RequestPage() {
                 value={form.model}
                 onChange={(e) => set("model", e.target.value)}
                 placeholder="Sportage, Creta…"
+                disabled={loading}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -181,6 +229,7 @@ export default function RequestPage() {
                 onChange={(e) => set("vin", e.target.value.toUpperCase())}
                 placeholder="17 символов"
                 maxLength={17}
+                disabled={loading}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -193,6 +242,7 @@ export default function RequestPage() {
                 onChange={(e) => set("partName", e.target.value)}
                 placeholder="Например: амортизатор передний левый"
                 required
+                disabled={loading}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -204,6 +254,7 @@ export default function RequestPage() {
                 value={form.oem}
                 onChange={(e) => set("oem", e.target.value)}
                 placeholder="Если знаете номер"
+                disabled={loading}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -215,12 +266,17 @@ export default function RequestPage() {
                 value={form.comment}
                 onChange={(e) => set("comment", e.target.value)}
                 placeholder="Сроки, предпочтения по бренду, фото…"
+                disabled={loading}
               />
             </label>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button type="submit" className="btn btn-accent">
-              Отправить заявку
+            <button
+              type="submit"
+              className="btn btn-accent"
+              disabled={loading}
+            >
+              {loading ? "Отправка…" : "Отправить заявку"}
             </button>
             <Link href="/catalog" className="btn btn-ghost">
               Сначала в каталог

@@ -12,6 +12,7 @@ import {
   saveOrder,
   type CheckoutDraft,
 } from "@/lib/storage";
+import { formatOrderMessage, submitWeb3Form } from "@/lib/web3forms";
 
 const empty: CheckoutDraft = {
   name: "",
@@ -27,6 +28,8 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState("");
   const [form, setForm] = useState<CheckoutDraft>(empty);
   const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [mailOk, setMailOk] = useState<boolean | null>(null);
 
   useEffect(() => {
     const draft = loadCheckoutDraft();
@@ -39,9 +42,9 @@ export default function CheckoutPage() {
     saveCheckoutDraft(form);
   }, [form, hydrated]);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!lines.length) return;
+    if (!lines.length || loading) return;
     const phoneDigits = form.phone.replace(/\D/g, "");
     if (phoneDigits.length < 10) {
       alert("Укажите корректный телефон (минимум 10 цифр)");
@@ -52,24 +55,46 @@ export default function CheckoutPage() {
       return;
     }
     const id = `WEB-${Date.now()}`;
-    saveOrder({
-      id,
-      createdAt: new Date().toISOString(),
-      status: "new",
-      ...form,
-      items: lines.map((l) => ({
-        id: l.product.id,
-        name: l.product.name,
-        oem: l.product.oem,
-        qty: l.qty,
-        price: l.product.price,
-      })),
-      total: totalPrice,
-    });
-    clearCheckoutDraft();
-    clear();
-    setOrderId(id);
-    setSent(true);
+    const items = lines.map((l) => ({
+      id: l.product.id,
+      name: l.product.name,
+      oem: l.product.oem,
+      qty: l.qty,
+      price: l.product.price,
+    }));
+
+    setLoading(true);
+    try {
+      const result = await submitWeb3Form({
+        subject: `Заказ KoreParts ${id} · ${totalPrice} ₽`,
+        name: form.name,
+        phone: form.phone,
+        message: formatOrderMessage({
+          id,
+          ...form,
+          total: totalPrice,
+          items,
+        }),
+      });
+      if (result.ok) setMailOk(true);
+      else if ("skipped" in result && result.skipped) setMailOk(null);
+      else setMailOk(false);
+
+      saveOrder({
+        id,
+        createdAt: new Date().toISOString(),
+        status: "new",
+        ...form,
+        items,
+        total: totalPrice,
+      });
+      clearCheckoutDraft();
+      clear();
+      setOrderId(id);
+      setSent(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent) {
@@ -81,8 +106,12 @@ export default function CheckoutPage() {
             Заказ {orderId} принят!
           </h1>
           <p className="mt-3 text-[var(--text-muted)]">
-            Данные сохранены в браузере. Менеджер свяжется с вами. Можно
-            продублировать заказ в{" "}
+            {mailOk === true
+              ? "Заказ отправлен на почту менеджеру. Мы свяжемся с вами."
+              : mailOk === false
+                ? "Заказ сохранён локально. Отправка на почту не удалась — продублируйте в Telegram."
+                : "Данные сохранены. Менеджер свяжется с вами."}{" "}
+            Можно продублировать в{" "}
             <a
               href={TELEGRAM_URL}
               className="text-[var(--blue-bright)] hover:underline"
@@ -201,8 +230,14 @@ export default function CheckoutPage() {
               placeholder="VIN, удобное время звонка…"
             />
           </label>
-          <button type="submit" className="btn btn-primary w-full sm:w-auto">
-            Подтвердить заказ · {formatPrice(totalPrice)}
+          <button
+            type="submit"
+            className="btn btn-primary w-full sm:w-auto"
+            disabled={loading}
+          >
+            {loading
+              ? "Отправка…"
+              : `Подтвердить заказ · ${formatPrice(totalPrice)}`}
           </button>
         </form>
 
