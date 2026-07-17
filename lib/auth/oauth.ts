@@ -10,8 +10,10 @@
  *   http://localhost:3000/auth/callback  (dev)
  */
 
+/** ClientID публичный (виден в URL OAuth). Secret на клиент НЕ кладём. */
 export const YANDEX_CLIENT_ID =
-  process.env.NEXT_PUBLIC_YANDEX_CLIENT_ID?.trim() || "";
+  process.env.NEXT_PUBLIC_YANDEX_CLIENT_ID?.trim() ||
+  "d6b57abe6ad746f8945f188a4b251c2c";
 export const VK_APP_ID = process.env.NEXT_PUBLIC_VK_APP_ID?.trim() || "";
 
 export function oauthRedirectUri(): string {
