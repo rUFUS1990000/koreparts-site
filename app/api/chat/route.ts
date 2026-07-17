@@ -6,7 +6,10 @@ export const runtime = "nodejs";
 
 type ChatMessage = { role: "user" | "assistant" | "system"; content: string };
 
-/** CORS: сайт на reg.ru (koreparts.ru) может дергать API на Vercel */
+/**
+ * CORS: сайт на reg.ru (koreparts.ru) ходит на Vercel /api/chat.
+ * Разрешаем публичные origin магазина + * fallback (без cookies).
+ */
 function corsHeaders(req: Request): HeadersInit {
   const origin = req.headers.get("origin") || "";
   const allowed = [
@@ -15,15 +18,18 @@ function corsHeaders(req: Request): HeadersInit {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
   ];
-  const allow =
+  const allowExact =
     allowed.includes(origin) ||
     origin.endsWith(".vercel.app") ||
     origin.endsWith(".koreparts.ru");
+  // Если origin пустой (curl/server) — * ; иначе отражаем доверенный origin
+  const aco = !origin ? "*" : allowExact ? origin : "https://koreparts.ru";
   return {
-    "Access-Control-Allow-Origin": allow ? origin : "https://koreparts.ru",
+    "Access-Control-Allow-Origin": aco,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
     "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
   };
 }
 

@@ -58,24 +58,26 @@ export function AiAssistant() {
         }),
       });
 
-      // Static hosting (reg.ru) — нет API, HTML 404
       const ct = res.headers.get("content-type") || "";
-      if (!res.ok || !ct.includes("application/json")) {
+      if (!ct.includes("application/json")) {
         setMessages((m) => [
           ...m,
           {
             role: "assistant",
             content:
-              "ИИ сейчас недоступен на этом хостинге.\n\nНужен Node/Vercel с ключом XAI_API_KEY или переменная NEXT_PUBLIC_CHAT_API_URL.\n\nПока напишите в Telegram @KorePartsBot или оставьте заявку /request.",
+              "Сервер ИИ вернул не JSON (часто static-хостинг без API).\n\nНужно: Vercel + XAI_API_KEY и NEXT_PUBLIC_CHAT_API_URL.\n\nПока — Telegram @KorePartsBot или заявка /request.",
           },
         ]);
         return;
       }
 
       const data = (await res.json()) as { reply?: string; error?: string };
+      // 503/502 тоже могут нести полезный reply
       const reply =
         data.reply ||
-        "Не удалось ответить. Напишите в Telegram @KorePartsBot.";
+        (res.ok
+          ? "Не удалось ответить. Напишите в Telegram @KorePartsBot."
+          : `Сервер ИИ: ошибка ${res.status}. Проверьте XAI_API_KEY на Vercel.`);
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch {
       setMessages((m) => [
@@ -83,7 +85,7 @@ export function AiAssistant() {
         {
           role: "assistant",
           content:
-            "Нет связи с сервером ИИ. Напишите в Telegram @KorePartsBot или оставьте заявку.",
+            "Нет связи с сервером ИИ (сеть или CORS).\n\n1) Vercel → XAI_API_KEY → Redeploy\n2) Сайт должен звать https://…vercel.app/api/chat\n\nПока — Telegram @KorePartsBot или /request.",
         },
       ]);
     } finally {
