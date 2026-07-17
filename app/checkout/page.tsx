@@ -17,6 +17,7 @@ import { formatOrderMessage, submitWeb3Form } from "@/lib/web3forms";
 const empty: CheckoutDraft = {
   name: "",
   phone: "",
+  email: "",
   city: "",
   address: "",
   comment: "",
@@ -29,7 +30,8 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<CheckoutDraft>(empty);
   const [hydrated, setHydrated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [mailOk, setMailOk] = useState<boolean | null>(null);
+  const [mailOk, setMailOk] = useState(false);
+  const [mailError, setMailError] = useState<string | null>(null);
 
   useEffect(() => {
     const draft = loadCheckoutDraft();
@@ -54,6 +56,11 @@ export default function CheckoutPage() {
       alert("Укажите имя");
       return;
     }
+    const email = (form.email || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Укажите email — заказ уйдёт менеджеру на почту");
+      return;
+    }
     const id = `WEB-${Date.now()}`;
     const items = lines.map((l) => ({
       id: l.product.id,
@@ -64,27 +71,38 @@ export default function CheckoutPage() {
     }));
 
     setLoading(true);
+    setMailError(null);
     try {
       const result = await submitWeb3Form({
         subject: `Заказ KoreParts ${id} · ${totalPrice} ₽`,
         name: form.name,
         phone: form.phone,
+        email,
         message: formatOrderMessage({
           id,
           ...form,
+          email,
           total: totalPrice,
           items,
         }),
       });
-      if (result.ok) setMailOk(true);
-      else if ("skipped" in result && result.skipped) setMailOk(null);
-      else setMailOk(false);
+      if (result.ok) {
+        setMailOk(true);
+      } else {
+        setMailOk(false);
+        setMailError(
+          "error" in result && result.error
+            ? result.error
+            : "Не удалось отправить на email",
+        );
+      }
 
       saveOrder({
         id,
         createdAt: new Date().toISOString(),
         status: "new",
         ...form,
+        email,
         items,
         total: totalPrice,
       });
@@ -106,12 +124,10 @@ export default function CheckoutPage() {
             Заказ {orderId} принят!
           </h1>
           <p className="mt-3 text-[var(--text-muted)]">
-            {mailOk === true
-              ? "Заказ отправлен на почту менеджеру. Мы свяжемся с вами."
-              : mailOk === false
-                ? "Заказ сохранён локально. Отправка на почту не удалась — продублируйте в Telegram."
-                : "Данные сохранены. Менеджер свяжется с вами."}{" "}
-            Можно продублировать в{" "}
+            {mailOk
+              ? "Заказ отправлен на почту менеджеру (проверьте «Спам» / «Промоакции» в Gmail). "
+              : `Заказ сохранён. Почта: ${mailError || "не отправлена"} — `}
+            продублируйте в{" "}
             <a
               href={TELEGRAM_URL}
               className="text-[var(--blue-bright)] hover:underline"
@@ -192,6 +208,19 @@ export default function CheckoutPage() {
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               placeholder="+7 900 123-45-67"
+              disabled={loading}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-semibold text-[var(--text-h)]">Email *</span>
+            <input
+              className="input"
+              required
+              type="email"
+              value={form.email || ""}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="you@email.com"
+              disabled={loading}
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">

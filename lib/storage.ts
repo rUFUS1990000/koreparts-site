@@ -10,6 +10,7 @@ const SEEDED_KEY = "koreparts-account-seeded-v2";
 export type CheckoutDraft = {
   name: string;
   phone: string;
+  email?: string;
   city: string;
   address: string;
   comment: string;
@@ -21,6 +22,7 @@ export type SavedOrder = {
   status: string;
   name: string;
   phone: string;
+  email?: string;
   city: string;
   address: string;
   comment: string;
@@ -52,6 +54,7 @@ export type SavedRequest = {
   status: string;
   name: string;
   phone: string;
+  email?: string;
   city: string;
   brand: string;
   model: string;

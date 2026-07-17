@@ -17,6 +17,7 @@ import {
 const empty = {
   name: "",
   phone: "",
+  email: "",
   city: "",
   brand: "",
   model: "",
@@ -31,7 +32,8 @@ export default function RequestPage() {
   const [form, setForm] = useState(empty);
   const [sent, setSent] = useState<SavedRequest | null>(null);
   const [loading, setLoading] = useState(false);
-  const [mailOk, setMailOk] = useState<boolean | null>(null);
+  const [mailOk, setMailOk] = useState(false);
+  const [mailError, setMailError] = useState<string | null>(null);
 
   function set<K extends keyof typeof empty>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -50,6 +52,10 @@ export default function RequestPage() {
       alert("Укажите корректный телефон (минимум 10 цифр)");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      alert("Укажите корректный email — на него придёт ответ, заявка уйдёт менеджеру");
+      return;
+    }
     if (form.partName.trim().length < 2) {
       alert("Укажите, какая деталь нужна");
       return;
@@ -60,29 +66,36 @@ export default function RequestPage() {
       createdAt: new Date().toISOString(),
       status: "new",
       ...form,
+      email: form.email.trim(),
     };
 
     setLoading(true);
+    setMailError(null);
     try {
       const result = await submitWeb3Form({
         subject: `Заявка KoreParts ${req.id}: ${form.partName}`,
         name: form.name,
         phone: form.phone,
+        email: form.email.trim(),
         message: formatRequestMessage(req),
       });
 
       if (result.ok) {
         setMailOk(true);
-      } else if ("skipped" in result && result.skipped) {
-        setMailOk(null);
-      } else {
-        setMailOk(false);
-        const err = "error" in result ? result.error : "Ошибка отправки";
-        // всё равно сохраняем локально, но предупреждаем
-        console.warn(err);
+        saveRequest(req);
+        setSent(req);
+        return;
       }
 
+      if ("skipped" in result && result.skipped) {
+        setMailError("Ключ Web3Forms не настроен");
+      } else {
+        setMailError("error" in result ? result.error : "Ошибка отправки");
+      }
+
+      // Сохраняем локально даже при сбое почты
       saveRequest(req);
+      setMailOk(false);
       setSent(req);
     } finally {
       setLoading(false);
@@ -94,16 +107,24 @@ export default function RequestPage() {
     return (
       <div className="container-kp py-12 md:py-16">
         <div className="card mx-auto max-w-lg p-8 text-center">
-          <div className="mb-3 text-4xl">✅</div>
+          <div className="mb-3 text-4xl">{mailOk ? "✅" : "⚠️"}</div>
           <h1 className="text-2xl font-bold text-[var(--text-h)]">
-            Заявка {sent.id} принята
+            {mailOk ? `Заявка ${sent.id} отправлена` : `Заявка ${sent.id} сохранена`}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
-            {mailOk === true
-              ? "Заявка отправлена на почту менеджеру и сохранена в личном кабинете."
-              : mailOk === false
-                ? "Сохранили в личном кабинете. Отправка на почту не удалась — продублируйте в Telegram."
-                : "Сохранили в личном кабинете. Чтобы ускорить ответ — продублируйте заявку в Telegram."}
+            {mailOk ? (
+              <>
+                Письмо ушло на почту менеджера (
+                <b>nogivinruka@gmail.com</b>
+                ). Проверьте также папки «Спам» и «Промоакции» в Gmail.
+              </>
+            ) : (
+              <>
+                На email менеджера отправить не удалось
+                {mailError ? `: ${mailError}` : ""}. Заявка сохранена в кабинете —
+                продублируйте в Telegram.
+              </>
+            )}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <a
@@ -137,7 +158,7 @@ export default function RequestPage() {
         форму. Ответим в рабочее время, обычно в течение 15–30 минут.
         {WEB3FORMS_ACCESS_KEY ? (
           <span className="mt-1 block text-xs text-[var(--success)]">
-            Заявка уйдёт менеджеру на email.
+            Заявка уйдёт на email менеджера (Web3Forms).
           </span>
         ) : null}
       </p>
@@ -170,6 +191,23 @@ export default function RequestPage() {
                 required
                 disabled={loading}
               />
+            </label>
+            <label className="block text-sm sm:col-span-2">
+              <span className="mb-1.5 block font-semibold text-[var(--text-h)]">
+                Email *
+              </span>
+              <input
+                className="input"
+                type="email"
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
+                placeholder="you@email.com"
+                required
+                disabled={loading}
+              />
+              <span className="mt-1 block text-xs text-[var(--text-muted)]">
+                Нужен для отправки заявки и ответа менеджера
+              </span>
             </label>
             <label className="block text-sm">
               <span className="mb-1.5 block font-semibold text-[var(--text-h)]">
@@ -270,6 +308,9 @@ export default function RequestPage() {
               />
             </label>
           </div>
+          {mailError && !sent ? (
+            <p className="mt-4 text-sm text-[var(--red-bright)]">{mailError}</p>
+          ) : null}
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="submit"
@@ -288,17 +329,16 @@ export default function RequestPage() {
           <div className="card p-5">
             <h2 className="font-bold text-[var(--text-h)]">Что указать</h2>
             <ul className="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+              <li>• Email и телефон — чтобы связаться</li>
               <li>• Марку, модель и год</li>
               <li>• VIN — для точного подбора</li>
               <li>• Название детали или OEM</li>
-              <li>• Город — для расчёта доставки</li>
             </ul>
           </div>
           <div className="card p-5">
             <h2 className="font-bold text-[var(--text-h)]">Telegram</h2>
             <p className="mt-2 text-sm text-[var(--text-muted)]">
-              Напишите менеджеру в боте или подпишитесь на канал с новостями и
-              акциями.
+              Напишите менеджеру в боте или подпишитесь на канал.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <a
