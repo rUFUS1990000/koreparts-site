@@ -171,136 +171,16 @@ export function ensureAccountDemo(): {
     return { profile, orders, requests, favorites };
   }
 
-  if (!profile.name) {
-    profile = {
-      name: "Алексей",
-      phone: "+7 (900) 123-45-67",
-      email: "alexey@example.com",
-      city: "Москва",
-      carBrand: "Hyundai",
-      carModel: "Creta",
-      carYear: "2021",
-      vin: "Z94G2811BMR234567",
-      bonuses: 1250,
-    };
-    saveProfile(profile);
-  } else if (profile.bonuses == null) {
-    profile = { ...profile, bonuses: 500 };
+  // Не подставляем фейкового «Алексея» — профиль из реального входа
+  if (profile.bonuses == null) {
+    profile = { ...profile, bonuses: profile.name ? 100 : 0 };
     saveProfile(profile);
   }
 
-  if (!orders.length) {
-    orders = [
-      {
-        id: "WEB-20260315-01",
-        createdAt: new Date(Date.now() - 12 * 86400000).toISOString(),
-        status: "delivered",
-        name: profile.name,
-        phone: profile.phone,
-        city: profile.city,
-        address: "ПВЗ СДЭК, ул. Ленина 12",
-        comment: "",
-        items: [
-          {
-            id: "581011ra00",
-            name: "Колодка тормозная перед Mobis Велостер / Солярис / Рио",
-            oem: "581011RA00",
-            qty: 1,
-            price: 1800,
-          },
-          {
-            id: "demo-oil-filter",
-            name: "Фильтр масляный Mobis",
-            oem: "26300-35503",
-            qty: 2,
-            price: 720,
-          },
-        ],
-        total: 3240,
-      },
-      {
-        id: "WEB-20260402-02",
-        createdAt: new Date(Date.now() - 4 * 86400000).toISOString(),
-        status: "shipped",
-        name: profile.name,
-        phone: profile.phone,
-        city: profile.city,
-        address: "ПВЗ Boxberry",
-        comment: "Позвоните за час",
-        items: [
-          {
-            id: "553101c500",
-            name: "Амортизатор Mobis Hyundai Getz 2002-",
-            oem: "553101C500",
-            qty: 2,
-            price: 2500,
-          },
-        ],
-        total: 5000,
-      },
-      {
-        id: "WEB-20260410-03",
-        createdAt: new Date(Date.now() - 1 * 86400000).toISOString(),
-        status: "new",
-        name: profile.name,
-        phone: profile.phone,
-        city: profile.city,
-        address: profile.city,
-        comment: "",
-        items: [
-          {
-            id: "555103w000",
-            name: "Стабилизатор задний Mobis Спортаж Туксон 09-",
-            oem: "555103W000",
-            qty: 1,
-            price: 2500,
-          },
-        ],
-        total: 2500,
-      },
-    ];
+  // Демо-заказы только если профиль уже заполнен (после первого входа)
+  if (!orders.length && profile.name) {
+    orders = [];
     writeJson(ORDERS_KEY, orders);
-  }
-
-  if (!requests.length) {
-    requests = [
-      {
-        id: "REQ-20260408-01",
-        createdAt: new Date(Date.now() - 6 * 86400000).toISOString(),
-        status: "done",
-        name: profile.name,
-        phone: profile.phone,
-        city: profile.city,
-        brand: "Hyundai",
-        model: "Creta",
-        year: "2021",
-        vin: profile.vin,
-        partName: "Датчик ABS передний правый",
-        oem: "95671-M0000",
-        comment: "Подтвердили наличие, заказ оформлен",
-      },
-      {
-        id: "REQ-20260414-02",
-        createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-        status: "in_progress",
-        name: profile.name,
-        phone: profile.phone,
-        city: profile.city,
-        brand: "Hyundai",
-        model: "Creta",
-        year: "2021",
-        vin: profile.vin,
-        partName: "Ремень приводной + ролик",
-        oem: "",
-        comment: "Ждём поставку 2–3 дня",
-      },
-    ];
-    writeJson(REQUESTS_KEY, requests);
-  }
-
-  if (!favorites.length) {
-    favorites = ["581011ra00", "553101c500", "555103w000"].filter(Boolean);
-    saveFavorites(favorites);
   }
 
   try {

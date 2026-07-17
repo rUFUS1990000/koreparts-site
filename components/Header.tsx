@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import { MAIN_NAV } from "@/lib/nav";
@@ -13,6 +14,7 @@ import { ThemeToggle } from "./ThemeToggle";
 export function Header() {
   const pathname = usePathname();
   const { totalQty } = useCart();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   function isActive(href: string) {
@@ -68,13 +70,13 @@ export function Header() {
             </Link>
 
             <Link
-              href="/account"
-              className={`btn btn-ghost btn-sm ${isActive("/account") ? "border-[var(--blue)] text-[var(--blue-bright)]" : ""}`}
-              aria-label="Личный кабинет"
+              href={user ? "/account" : "/login"}
+              className={`btn btn-ghost btn-sm ${isActive("/account") || isActive("/login") ? "border-[var(--blue)] text-[var(--blue-bright)]" : ""}`}
+              aria-label={user ? "Личный кабинет" : "Войти"}
             >
               <UserIcon />
-              <span className="ml-1.5 hidden font-semibold md:inline">
-                Кабинет
+              <span className="ml-1.5 hidden max-w-[7rem] truncate font-semibold md:inline">
+                {user ? user.name.split(" ")[0] || "Кабинет" : "Войти"}
               </span>
             </Link>
 
@@ -113,7 +115,10 @@ export function Header() {
               {[
                 { href: "/", label: "Главная" },
                 ...MAIN_NAV,
-                { href: "/account", label: "Личный кабинет" },
+                {
+                  href: user ? "/account" : "/login",
+                  label: user ? "Личный кабинет" : "Войти",
+                },
                 { href: "/cart", label: "Корзина" },
               ].map((l) => (
                 <Link

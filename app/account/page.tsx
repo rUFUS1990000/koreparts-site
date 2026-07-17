@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/lib/auth/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { TELEGRAM_CHANNEL_URL, TELEGRAM_URL } from "@/lib/constants";
 import {
@@ -14,6 +16,10 @@ import {
 } from "@/lib/products";
 import {
   ensureAccountDemo,
+  loadOrders,
+  loadProfile,
+  loadRequests,
+  loadFavorites,
   orderStatusLabel,
   orderStatusTone,
   saveFavorites,
@@ -26,6 +32,8 @@ import {
 type Tab = "overview" | "profile" | "orders" | "requests" | "favorites" | "garage";
 
 export default function AccountPage() {
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const { totalQty, totalPrice, lines } = useCart();
   const [tab, setTab] = useState<Tab>("overview");
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -36,13 +44,28 @@ export default function AccountPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      router.replace("/login?next=/account");
+      return;
+    }
+    // подтянуть имя/email из auth в профиль
+    const p = loadProfile();
+    if (!p.name && user.name) p.name = user.name;
+    if (!p.email && user.email) p.email = user.email;
+    saveProfile(p);
+
     const data = ensureAccountDemo();
-    setProfile(data.profile);
-    setOrders(data.orders);
-    setRequests(data.requests);
-    setFavorites(data.favorites);
+    setProfile({
+      ...data.profile,
+      name: data.profile.name || user.name,
+      email: data.profile.email || user.email,
+    });
+    setOrders(data.orders.length ? data.orders : loadOrders());
+    setRequests(data.requests.length ? data.requests : loadRequests());
+    setFavorites(data.favorites.length ? data.favorites : loadFavorites());
     setHydrated(true);
-  }, []);
+  }, [authLoading, user, router]);
 
   const favProducts = useMemo(
     () => favorites.map((id) => getProduct(id)).filter(Boolean),
@@ -65,20 +88,27 @@ export default function AccountPage() {
     saveFavorites(next);
   }
 
-  if (!hydrated || !profile) {
+  if (authLoading || !user || !hydrated || !profile) {
     return (
       <div className="container-kp py-16 text-center text-[var(--text-muted)]">
-        Загрузка кабинета…
+        {authLoading || !user ? "Проверка входа…" : "Загрузка кабинета…"}
       </div>
     );
   }
 
-  const initials = (profile.name || "КП")
+  const initials = (profile.name || user.name || "КП")
     .split(/\s+/)
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const providerLabel =
+    user.provider === "vk"
+      ? "VK"
+      : user.provider === "yandex"
+        ? "Яндекс"
+        : "Email";
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: "overview", label: "Обзор" },
@@ -105,12 +135,16 @@ export default function AccountPage() {
                 Личный кабинет KoreParts
               </div>
               <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white md:text-3xl">
-                {profile.name || "Гость"}
+                {profile.name || user.name || "Пользователь"}
               </h1>
               <p className="mt-1 text-sm text-white/85">
-                {[profile.city, profile.phone, profile.email]
+                {[profile.city, profile.phone, profile.email || user.email]
                   .filter(Boolean)
                   .join(" · ") || "Заполните профиль"}
+              </p>
+              <p className="mt-1 text-xs text-white/70">
+                Вход: {providerLabel}
+                {user.avatar ? " · соцсеть" : ""}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -120,6 +154,16 @@ export default function AccountPage() {
               <Link href="/catalog" className="btn btn-sm border border-white/40 bg-white/10 text-white hover:bg-white/20">
                 Каталог
               </Link>
+              <button
+                type="button"
+                className="btn btn-sm border border-white/40 bg-white/10 text-white hover:bg-white/20"
+                onClick={() => {
+                  logout();
+                  router.push("/login");
+                }}
+              >
+                Выйти
+              </button>
             </div>
           </div>
         </div>
