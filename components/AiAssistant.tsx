@@ -44,40 +44,74 @@ export function AiAssistant() {
     setLoading(true);
 
     try {
-      // На reg.ru (static) /api/chat нет — можно указать внешний URL (Vercel):
-      // NEXT_PUBLIC_CHAT_API_URL=https://ваш-проект.vercel.app/api/chat
-      const apiBase =
-        (process.env.NEXT_PUBLIC_CHAT_API_URL || "").trim().replace(/\/$/, "") ||
-        "/api/chat";
+      // PHP на reg.ru (тот же домен, без CORS) → env URL → Next API
+      const envUrl = (process.env.NEXT_PUBLIC_CHAT_API_URL || "")
+        .trim()
+        .replace(/\/$/, "");
+      const endpoints = Array.from(
+        new Set(
+          ["/api/chat.php", envUrl, "/api/chat"].filter(
+            (u): u is string => Boolean(u),
+          ),
+        ),
+      );
 
-      const res = await fetch(apiBase, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: next.map((m) => ({ role: m.role, content: m.content })),
-        }),
-      });
+      let res: Response | null = null;
+      let lastErr: unknown = null;
+      for (const url of endpoints) {
+        try {
+          const r = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              messages: next.map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
+            }),
+          });
+          const ct = r.headers.get("content-type") || "";
+          if (!ct.includes("application/json")) {
+            lastErr = `non-json ${r.status} from ${url}`;
+            continue;
+          }
+          // 503 no_api_key на одном endpoint — пробуем следующий
+          if (r.status === 503) {
+            const peek = (await r.clone().json()) as { error?: string };
+            if (peek.error === "no_api_key") {
+              lastErr = `no key at ${url}`;
+              continue;
+            }
+          }
+          res = r;
+          break;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
 
-      const ct = res.headers.get("content-type") || "";
-      if (!ct.includes("application/json")) {
+      if (!res) {
         setMessages((m) => [
           ...m,
           {
             role: "assistant",
             content:
-              "Сервер ИИ вернул не JSON (часто static-хостинг без API).\n\nНужно: Vercel + XAI_API_KEY и NEXT_PUBLIC_CHAT_API_URL.\n\nПока — Telegram @KorePartsBot или заявка /request.",
+              "Нет связи с сервером ИИ.\n\nНа reg.ru залейте файл /api/chat.php и /api/config.local.php с ключом xAI.\n\nПока — Telegram @KorePartsBot или заявка /request.",
           },
         ]);
+        console.warn("AI endpoints failed", lastErr);
         return;
       }
 
       const data = (await res.json()) as { reply?: string; error?: string };
-      // 503/502 тоже могут нести полезный reply
       const reply =
         data.reply ||
         (res.ok
           ? "Не удалось ответить. Напишите в Telegram @KorePartsBot."
-          : `Сервер ИИ: ошибка ${res.status}. Проверьте XAI_API_KEY на Vercel.`);
+          : `Сервер ИИ: ${data.error || res.status}. Проверьте ключ XAI_API_KEY.`);
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch {
       setMessages((m) => [
@@ -85,7 +119,7 @@ export function AiAssistant() {
         {
           role: "assistant",
           content:
-            "Нет связи с сервером ИИ (сеть или CORS).\n\n1) Vercel → XAI_API_KEY → Redeploy\n2) Сайт должен звать https://…vercel.app/api/chat\n\nПока — Telegram @KorePartsBot или /request.",
+            "Нет связи с сервером ИИ. Напишите в Telegram @KorePartsBot или оставьте заявку /request.",
         },
       ]);
     } finally {

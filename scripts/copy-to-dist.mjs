@@ -29,6 +29,20 @@ if (fs.existsSync(htSrc) && !fs.existsSync(htDest)) {
   console.log("  + скопирован .htaccess");
 }
 
+// PHP AI proxy + local key (reg.ru)
+const apiPhp = path.join(root, "public", "api");
+const apiDest = path.join(dest, "api");
+if (fs.existsSync(apiPhp)) {
+  fs.mkdirSync(apiDest, { recursive: true });
+  for (const name of ["chat.php", "config.sample.php", "config.local.php"]) {
+    const from = path.join(apiPhp, name);
+    if (fs.existsSync(from)) {
+      fs.copyFileSync(from, path.join(apiDest, name));
+      console.log(`  + api/${name}`);
+    }
+  }
+}
+
 // Подсчёт
 function countFiles(dir) {
   let n = 0;
